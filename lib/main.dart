@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/network/api_service.dart';
 import 'core/network/dio_client.dart';
@@ -16,6 +17,16 @@ final apiServiceProvider = Provider<ApiService>((ref) {
 
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.white,          // background
+      statusBarIconBrightness: Brightness.dark, // Android icons
+      statusBarBrightness: Brightness.light, // iOS
+    ),
+  );
+
   runApp(const ProviderScope(child: PinterestApp()));
 }
 
@@ -25,8 +36,20 @@ class PinterestApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: Colors.white,
+
+        colorScheme: const ColorScheme.light(
+          primary: Colors.black,
+          onPrimary: Colors.white,
+          secondary: Colors.black,
+          background: Colors.white,
+          surface: Colors.white,
+          onSurface: Colors.black,
+        ),
       ),
       routerConfig:  appRouter,
     );
