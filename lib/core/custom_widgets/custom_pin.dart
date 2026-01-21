@@ -5,10 +5,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 class CustomPin extends StatelessWidget {
   final String image;
   final bool isNetwork;
+  final double? imageH;
   final VoidCallback? onTap;
 
   const CustomPin({
     super.key,
+    required this.imageH,
     required this.image,
     required this.isNetwork,
     this.onTap,
@@ -26,6 +28,8 @@ class CustomPin extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: SizedBox(
+              height: imageH! - 30,
+              width: double.infinity,
               child: _buildImage(),
             ),
           ),

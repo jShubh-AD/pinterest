@@ -8,10 +8,4 @@ class HomeRepoImp extends HomeRepository{
   Future<List<PinModel>> fetchPins(Map<String,dynamic> parameters) async{
     return await HomeDataSource().fetchPins(parameters);
   }
-
-  // @override
-  // Future<PinModel> fetchPinById(String id) {
-  //   // TODO: implement fetchPinById
-  //   throw UnimplementedError();
-  // }
 }
