@@ -34,7 +34,7 @@ class CustomPin extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(right: 8, top: 6),
+            padding: const EdgeInsets.only(right: 8),
             child: const Align(
               alignment: Alignment.centerRight,
               child: Icon(Icons.more_horiz, size: 20),

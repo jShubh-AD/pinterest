@@ -21,9 +21,7 @@ class Home extends ConsumerWidget {
           length: 2,
           child: Column(
             children: [
-            SizedBox(
-            height: 48,
-            child: Stack(
+            Stack(
               children: [
                 TabBar(
                   tabAlignment: TabAlignment.start,
@@ -51,12 +49,12 @@ class Home extends ConsumerWidget {
                   ],
                 ),
 
-                Positioned(
-                  right: 20,
-                  top: 0,
-                  bottom: 8,
+                Align(
+                  alignment: Alignment.topRight,
                   child: Container(
                     width: 40,
+                    height: 40,
+                    margin: EdgeInsets.only(right: 8),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(12),
@@ -66,7 +64,6 @@ class Home extends ConsumerWidget {
                 ),
               ],
             ),
-          ),
             Expanded(
                 child: TabBarView(
                   children: [

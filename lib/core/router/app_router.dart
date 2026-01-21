@@ -1,5 +1,5 @@
 import 'package:go_router/go_router.dart';
-import 'package:pinterest/features/home/presentation/views/home.dart';
+import 'package:pinterest/features/home/presentation/views/dashboard.dart';
 import 'package:pinterest/features/pin_page/presentations/views/pin_details.dart';
 
 final appRouter = GoRouter(
@@ -7,7 +7,7 @@ final appRouter = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const Home(),
+      builder: (context, state) => const Dashboard(),
     ),
     GoRoute(
       path: '/pin_details/:id',
