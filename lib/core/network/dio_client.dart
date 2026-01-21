@@ -14,10 +14,10 @@ class DioClient {
         connectTimeout: ApiConstants.connectTimeout,
         receiveTimeout: ApiConstants.receiveTimeout,
         sendTimeout: ApiConstants.sendTimeout,
-        queryParameters: {
-          'client_id': ApiConstants.key,
-        },
         contentType: 'application/json',
+        queryParameters: {
+          "client_id": ApiConstants.key
+        }
       ),
     );
 

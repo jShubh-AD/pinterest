@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
 
-class ApiService {
-  final Dio dio;
+import 'dio_client.dart';
 
-  ApiService(this.dio);
+class ApiService {
+
+  static final Dio _dio = DioClient().dio;
 
   /// GET list response
   Future<List<T>> getList<T>({
@@ -12,7 +13,7 @@ class ApiService {
     Map<String, dynamic>? query,
   }) async {
     try {
-      final response = await dio.get(
+      final response = await _dio.get(
         path,
         queryParameters: query,
       );
@@ -38,7 +39,7 @@ class ApiService {
     Map<String, dynamic>? query,
   }) async {
     try {
-      final response = await dio.get(
+      final response = await _dio.get(
         path,
         queryParameters: query,
       );

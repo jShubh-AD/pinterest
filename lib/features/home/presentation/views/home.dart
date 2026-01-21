@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:go_router/go_router.dart';
 import 'package:pinterest/core/constants/app_images.dart';
 import 'package:pinterest/core/custom_widgets/custom_pin.dart';
 
@@ -9,6 +8,7 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: SafeArea(
         // 1. For You tab -> Mansonry grid view
@@ -29,7 +29,7 @@ class Home extends StatelessWidget {
               child: CustomPin(
                 image: AppImages.ai2,
                 isNetwork: false,
-                onTap: () => context.push("/pin_details/1"),
+                // onTap: () => Navigator.push(context, MaterialPageRoute(builder: (c)=> Hometest())),
               ),
             );
           },
