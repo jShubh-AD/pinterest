@@ -18,7 +18,7 @@ class Home extends ConsumerWidget {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: DefaultTabController(
-          length: 2,
+          length: 1,
           child: Column(
             children: [
               const SizedBox(height:12),
@@ -50,7 +50,6 @@ class Home extends ConsumerWidget {
                     ),
                     tabs: const [
                       Tab(text: 'For you'),
-                      Tab(text: 'Boards'),
                     ],
                   ),
                 ),
@@ -98,7 +97,6 @@ class Home extends ConsumerWidget {
                         },
                       ),
                     ),
-                    Center(key: PageStorageKey("boards"),child: Text("Board")),
                   ],
                 ),
               ),

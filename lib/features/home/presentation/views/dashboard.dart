@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pinterest/features/home/presentation/riverpod/dashboard_provider.dart';
 import 'package:pinterest/features/home/presentation/views/home.dart';
+import 'package:pinterest/features/search/presentation/views/search.dart';
 
 class Dashboard extends ConsumerWidget {
   const Dashboard({super.key});
@@ -18,7 +19,7 @@ class Dashboard extends ConsumerWidget {
         index: currentIndex,
         children: const [
           Home(),
-          Placeholder(),
+          Search(),
           Placeholder(),
           Placeholder(),
           Placeholder(),
