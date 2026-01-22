@@ -56,20 +56,23 @@ class PinterestBottomBar extends StatelessWidget {
     return SafeArea(
       child: SizedBox(
         height: 50,
-        child: Row(
-          children: List.generate(5, (i) {
-            final isActive = i == currentIndex;
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: List.generate(5, (i) {
+              final isActive = i == currentIndex;
 
-            return Expanded(
-              child: Center(
-                child: PressIcon(
-                  icon: _iconFor(i, isActive),
-                  label: labels[i],
-                  onTap: () => onTap(i)
+              return Expanded(
+                child: Center(
+                  child: PressIcon(
+                    icon: _iconFor(i, isActive),
+                    label: labels[i],
+                    onTap: () => onTap(i)
+                  ),
                 ),
-              ),
-            );
-          }),
+              );
+            }),
+          ),
         ),
       ),
     );

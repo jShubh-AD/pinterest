@@ -1,6 +1,8 @@
 import 'package:go_router/go_router.dart';
-import 'package:pinterest/features/home/presentation/views/dashboard.dart';
-import 'package:pinterest/features/pin_page/presentations/views/pin_details.dart';
+import 'package:pinterest/features/home/data/pin_response_model.dart';
+import '../../features/home/presentation/views/dashboard.dart';
+import '../../features/pin_page/presentations/views/pin_details.dart';
+import 'package:flutter/cupertino.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -10,10 +12,10 @@ final appRouter = GoRouter(
       builder: (context, state) => const Dashboard(),
     ),
     GoRoute(
-      path: '/pin_details/:id',
-      builder: (context, state) {
-        final id = state.pathParameters['id']!;
-        return PinDetails(pinId: id);
+      path: '/pin_details',
+      pageBuilder: (context, state) {
+        final PinModel pin = state.extra! as PinModel;
+        return CupertinoPage(child: PinDetails(pin: pin));
       },
     ),
   ],

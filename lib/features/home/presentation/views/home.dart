@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pinterest/core/custom_widgets/custom_pin.dart';
 
@@ -12,7 +14,6 @@ class Home extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pinsAsync = ref.watch(homePinsProvider);
-    // final TabController tabController = TabController(length: 1, vsync: vsync)
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -21,55 +22,57 @@ class Home extends ConsumerWidget {
           length: 2,
           child: Column(
             children: [
-            Stack(
+              const SizedBox(height:12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TabBar(
-                  tabAlignment: TabAlignment.start,
-                  isScrollable: true,
-                  dividerColor: Colors.transparent,
-                  indicator: const UnderlineTabIndicator(
-                    borderSide: BorderSide(width: 2, color: Colors.black),
-                    insets: EdgeInsets.only(bottom: 8),
-                  ),
-                  splashFactory: NoSplash.splashFactory,
-                  overlayColor: MaterialStateProperty.all(Colors.transparent),
-                  labelColor: Colors.black,
-                  unselectedLabelColor: Colors.black,
-                  labelStyle: GoogleFonts.roboto(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  unselectedLabelStyle: GoogleFonts.roboto(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  tabs: const [
-                    Tab(text: 'For you'),
-                    Tab(text: 'Boards'),
-                  ],
-                ),
-
-                Align(
-                  alignment: Alignment.topRight,
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    margin: EdgeInsets.only(right: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(12),
+                Expanded(
+                  flex: 1,
+                  child: TabBar(
+                    tabAlignment: TabAlignment.start,
+                    isScrollable: true,
+                    dividerColor: Colors.transparent,
+                    indicator: const UnderlineTabIndicator(
+                      borderSide: BorderSide(width: 2, color: Colors.black),
+                      insets: EdgeInsets.only(bottom: 12),
                     ),
-                    child: const Icon(Icons.edit, color: Colors.black),
+                    splashFactory: NoSplash.splashFactory,
+                    overlayColor: MaterialStateProperty.all(Colors.transparent),
+                    labelColor: Colors.black,
+                    unselectedLabelColor: Colors.black,
+                    labelStyle: GoogleFonts.roboto(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    unselectedLabelStyle: GoogleFonts.roboto(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    tabs: const [
+                      Tab(text: 'For you'),
+                      Tab(text: 'Boards'),
+                    ],
                   ),
+                ),
+                Container(
+                  width: 40,
+                  height: 40,
+                  margin: EdgeInsets.only(right: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.edit, color: Colors.black),
                 ),
               ],
             ),
+
             Expanded(
                 child: TabBarView(
                   children: [
                     pinsAsync.when(
-                      loading: () =>
-                          const Center(child: CircularProgressIndicator()),
+                      loading: () => const Center(child: CircularProgressIndicator()),
                       error: (e, _) => Center(child: Text(e.toString())),
                       data: (pins) => MasonryGridView.count(
                         physics: const BouncingScrollPhysics(),
@@ -80,11 +83,16 @@ class Home extends ConsumerWidget {
                         crossAxisSpacing: 4,
                         itemBuilder: (context, index) {
                           final pin = pins[index];
-                          return CustomPin(
-                            imageH: index.isEven ? 180 : 250,
-                            image: pin.urls.small,
-                            isNetwork: true,
-                            // onTap: () => Navigator.push(context, MaterialPageRoute(builder: (c)=> Hometest())),
+                          return Container(
+                            constraints: const BoxConstraints(minHeight: 120, maxHeight: 1200),
+                            child: CustomPin(
+                              pin: pin,
+                              isNetwork: true,
+                              onLongPress: (){
+                                print("rehistered long ressed");
+                              },
+                              onTap: () => context.push("/pin_details",extra: pin),
+                            ),
                           );
                         },
                       ),
