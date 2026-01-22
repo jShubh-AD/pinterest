@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 SnackBar _baseSnackBar({
   required Widget content,
@@ -7,11 +8,11 @@ SnackBar _baseSnackBar({
 }) {
   return SnackBar(
     behavior: SnackBarBehavior.floating,
-    backgroundColor: const Color(0xFF4A4A45),
+    backgroundColor: Color(0xFF4A4A45),
     margin: const EdgeInsets.all(16),
     duration: duration,
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(28),
+      borderRadius: BorderRadius.circular(12),
     ),
     content: content,
     action: action,
@@ -66,7 +67,7 @@ class InfoSnackBar {
       _baseSnackBar(
         content: Text(
           text,
-          style: const TextStyle(color: Colors.white, fontSize: 16),
+          style: GoogleFonts.roboto(color: Colors.white, fontSize: 16),
         ),
         duration: duration,
       ),

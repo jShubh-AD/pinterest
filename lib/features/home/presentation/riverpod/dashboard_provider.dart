@@ -9,7 +9,19 @@ class BottomNavIndexNotifier extends Notifier<int> {
   }
 }
 
-final bottomNavIndexProvider =
-NotifierProvider<BottomNavIndexNotifier, int>(
+final bottomNavIndexProvider = NotifierProvider<BottomNavIndexNotifier, int>(
   BottomNavIndexNotifier.new,
+);
+
+class AddPanelNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void show(bool show) {
+    state = show;
+  }
+}
+
+final addPanelProvider = NotifierProvider<AddPanelNotifier, bool>(
+  AddPanelNotifier.new,
 );

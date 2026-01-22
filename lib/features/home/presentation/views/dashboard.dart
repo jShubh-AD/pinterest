@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pinterest/features/home/presentation/riverpod/dashboard_provider.dart';
 import 'package:pinterest/features/home/presentation/views/home.dart';
+import 'package:pinterest/features/home/presentation/views/widgets/action_buttons.dart';
 import 'package:pinterest/features/search/presentation/views/search.dart';
+
+import '../../../../core/custom_widgets/snackbars.dart';
 
 class Dashboard extends ConsumerWidget {
   const Dashboard({super.key});
@@ -12,45 +14,136 @@ class Dashboard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = ref.watch(bottomNavIndexProvider);
+    final show = ref.watch(addPanelProvider);
+
+    InfoSnackBar onActionTap() => InfoSnackBar(context: context, text: 'This feature will be added soon');
 
 
+    final actions = [
+      CreateAction(
+        icon: Icons.push_pin_outlined,
+        label: 'Pin',
+        onTap: () => onActionTap().show(),
+      ),
+      CreateAction(
+        icon: Icons.dashboard_customize_outlined,
+        label: 'Collage',
+        onTap: () => onActionTap().show(),
+      ),
+      CreateAction(
+        icon: Icons.view_quilt_outlined,
+        label: 'Board',
+        onTap: () => onActionTap().show(),
+      ),
+    ];
     return Scaffold(
-      body: IndexedStack(
-        index: currentIndex,
-        children: const [
-          Home(),
-          Search(),
-          Placeholder(),
-          Placeholder(),
-          Placeholder(),
+      body: Stack(
+        children: [
+          IndexedStack(
+            index: currentIndex,
+            children: [
+              const Home(),
+              const Search(),
+              const Placeholder(),
+              const Placeholder(),
+              const Placeholder(),
+            ],
+          ),
+          if(show)
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: ()=>ref.read(addPanelProvider.notifier).show(false),
+                child: Container(
+                 color: Colors.grey.withOpacity(0.2),
+                ),
+              ),
+            ),
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: show ? 210 : 0,
+            child: Material(
+              color: Colors.white,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            ref.read(addPanelProvider.notifier).show(false);
+                          },
+                          child: Icon(Icons.close, size: 34),
+                        ),
+                        Text(
+                            "Start creating now",
+                          style: GoogleFonts.roboto(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16
+                          ),
+                        ),
+                        SizedBox(width: 20,)
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: actions
+                          .map((e) => CreateActionButton(action: e))
+                          .toList(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
       bottomNavigationBar: PinterestBottomBar(
+        height: show ? 0 : 50,
         currentIndex: currentIndex,
-        onTap: (i) => ref.read(bottomNavIndexProvider.notifier).setIndex(i)
+        onTap: (i) {
+          if (i == 2) {
+            ref.read(addPanelProvider.notifier).show(true);
+          } else {
+            ref.read(addPanelProvider.notifier).show(false);
+            ref.read(bottomNavIndexProvider.notifier).setIndex(i);
+          }
+        },
       ),
     );
   }
 }
 
-
 class PinterestBottomBar extends StatelessWidget {
   final int currentIndex;
+  final double height;
   final ValueChanged<int> onTap;
 
   const PinterestBottomBar({
     super.key,
+    required this.height,
     required this.currentIndex,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final labels = ["Home","Search","Create","Inbox","Profile"];
+    final labels = ["Home", "Search", "Create", "Inbox", "Profile"];
 
     return SafeArea(
-      child: SizedBox(
-        height: 50,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        height: height,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
@@ -62,7 +155,7 @@ class PinterestBottomBar extends StatelessWidget {
                   child: PressIcon(
                     icon: _iconFor(i, isActive),
                     label: labels[i],
-                    onTap: () => onTap(i)
+                    onTap: () => onTap(i),
                   ),
                 ),
               );
@@ -82,8 +175,7 @@ class PinterestBottomBar extends StatelessWidget {
       case 2:
         return Icons.add;
       case 3:
-        return active
-            ? Icons.notifications : Icons.notifications_outlined;
+        return active ? Icons.notifications : Icons.notifications_outlined;
       case 4:
         return active ? Icons.person : Icons.person_outline;
       default:
@@ -130,21 +222,17 @@ class _PressIconState extends State<PressIcon> {
             scale: pressed ? 0.80 : 1.0,
             duration: const Duration(milliseconds: 100),
             curve: Curves.linear,
-            child: Icon(
-              widget.icon,
-              size: 24,
+            child: Icon(widget.icon, size: 24),
+          ),
+          Text(
+            widget.label,
+            style: GoogleFonts.roboto(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          Text(widget.label,
-          style: GoogleFonts.roboto(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          )),
         ],
       ),
     );
   }
 }
-
-
-

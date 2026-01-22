@@ -199,6 +199,7 @@ class _PinDetailsState extends ConsumerState<PinDetails>{
         builder: (_, show, __) {
           if (!show) return const SizedBox.shrink();
           return PinterestBottomBar(
+            height: 50,
             currentIndex: ref.watch(bottomNavIndexProvider),
             onTap: (i) {
               context.go("/");
