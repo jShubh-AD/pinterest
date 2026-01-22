@@ -13,63 +13,89 @@ class Search extends StatefulWidget {
 
 class _SearchState extends State<Search> {
   int _current = 0;
+  double _bgOpacity = 0;
+  
+  final scrollCtrl = ScrollController();
+  
+  @override
+  void initState(){
+    super.initState();
+    scrollCtrl.addListener((){
+      setState(() {
+        _bgOpacity = (scrollCtrl.offset / 250).clamp(0, 1);
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Colors.grey,
       body: SafeArea(
-        child: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            SliverAppBar(
-              toolbarHeight: 65,
-              centerTitle: false,
-              pinned: true,
-              floating: true,
-              snap: true,
-              expandedHeight: 390,
-              backgroundColor: Colors.white,
-              surfaceTintColor: Colors.transparent,
-              flexibleSpace: FlexibleSpaceBar(background: bannerCarousel()),
-              title: Container(
-                height: 46,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey, width: 1),
-                ),
-                child: Row(
-                  children: [
-                    SizedBox(width: 12),
-                    Icon(
-                      Icons.search,
-                      color: Colors.black,
-                      size: 22,
-                    ),
-                    SizedBox(width: 12),
-                    Text("Search for ideas",
-                      style: GoogleFonts.roboto(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    const Spacer(),
-                    Icon(
-                      Icons.camera_alt_outlined,
-                      color: Colors.black,
-                      size: 18,
-                    ),
-                    SizedBox(width: 12),
-                  ],
-                ),
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              controller: scrollCtrl,
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  bannerCarousel(),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemBuilder: (c,i)=> Text("index : $i"),
+                    itemCount: 50,
+                  )
+                ],
               ),
             ),
-            SliverFillRemaining(),
-          ],
-        ),
+            Positioned(
+                top: 0,
+                child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding: EdgeInsets.fromLTRB(16,16,16,4),
+                    color: Colors.white.withOpacity(_bgOpacity),
+                    child: searchBox()
+                )
+            ),
+          ]
+        )
+      ),
+    );
+  }
+
+  Widget searchBox(){
+    return Container(
+      height: 46,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey, width: 1),
+      ),
+      child: Row(
+        children: [
+          SizedBox(width: 12),
+          Icon(
+            Icons.search,
+            color: Colors.black,
+            size: 22,
+          ),
+          SizedBox(width: 12),
+          Text("Search for ideas",
+            style: GoogleFonts.roboto(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey,
+            ),
+          ),
+          const Spacer(),
+          Icon(
+            Icons.camera_alt_outlined,
+            color: Colors.black,
+            size: 18,
+          ),
+          SizedBox(width: 12),
+        ],
       ),
     );
   }
