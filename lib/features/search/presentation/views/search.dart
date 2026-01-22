@@ -1,6 +1,10 @@
+import 'dart:developer';
+
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pinterest/core/constants/app_images.dart';
 import 'package:pinterest/core/custom_widgets/custom_pin.dart';
 
@@ -14,15 +18,15 @@ class Search extends StatefulWidget {
 class _SearchState extends State<Search> {
   int _current = 0;
   double _bgOpacity = 0;
-  
+
   final scrollCtrl = ScrollController();
-  
+
   @override
   void initState(){
     super.initState();
     scrollCtrl.addListener((){
       setState(() {
-        _bgOpacity = (scrollCtrl.offset / 250).clamp(0, 1);
+        _bgOpacity = ((scrollCtrl.position.pixels - 20) / 200).clamp(0, 1);
       });
     });
   }
@@ -33,28 +37,76 @@ class _SearchState extends State<Search> {
       body: SafeArea(
         child: Stack(
           children: [
-            SingleChildScrollView(
-              controller: scrollCtrl,
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                children: [
-                  bannerCarousel(),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemBuilder: (c,i)=> Text("index : $i"),
-                    itemCount: 50,
-                  )
-                ],
+            CustomRefreshIndicator(
+              offsetToArmed: 80,
+              onRefresh: () async {
+                await Future.delayed(Duration(seconds: 10));
+              },
+              builder: (context, child, controller) {
+                log("ctrl state: ${controller.state}");
+                return Stack(
+                  alignment: Alignment.topCenter,
+                  children: [
+                    Positioned(
+                      top: controller.state == IndicatorState.armed
+                          || controller.state == IndicatorState.dragging
+                          || controller.state == IndicatorState.settling
+                          ? 40 * controller.value
+                          : 0,
+                      child: Container(
+                        height: 40 * controller.value,
+                        constraints: BoxConstraints(
+                            maxHeight: 40
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Lottie.asset(
+                          'assets/lottie/refresh_loading.json',
+                          fit: BoxFit.cover,
+                          repeat: controller.isLoading,
+                          animate: controller.isLoading,
+                        ),
+                      ),
+                    ),
+                    Transform.translate(
+                      offset: Offset(0.0, 40 * controller.value),
+                      child: child,
+                    )
+                  ],
+                );
+              },
+              child: SingleChildScrollView(
+                controller: scrollCtrl,
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  children: [
+                    bannerCarousel(),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemBuilder: (c, i) => GestureDetector(
+                        onTap: () {
+                          print(" i m taped: $i");
+                        },
+                        child: Text("index : $i"),
+                      ),
+                      itemCount: 50,
+                    )
+                  ],
+                ),
               ),
             ),
             Positioned(
                 top: 0,
                 child: Container(
                     width: MediaQuery.of(context).size.width,
-                    padding: EdgeInsets.fromLTRB(16,16,16,4),
+                    padding: EdgeInsets.fromLTRB(16,14,16,6),
                     color: Colors.white.withOpacity(_bgOpacity),
-                    child: searchBox()
+                    child: GestureDetector(
+                      onTap: (){print("going");}
+                        ,child: searchBox())
                 )
             ),
           ]
@@ -65,7 +117,7 @@ class _SearchState extends State<Search> {
 
   Widget searchBox(){
     return Container(
-      height: 46,
+      height: 44,
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -105,10 +157,12 @@ class _SearchState extends State<Search> {
       height: 390,
       child: Column(
         children: [
-          Stack(
-            children:[ CarouselSlider.builder(
-              itemCount: 2,
-              itemBuilder: (_, i, __) => SizedBox(
+          CarouselSlider.builder(
+          itemCount: 2,
+          itemBuilder: (_, i, __) => Stack(
+            children: [
+              SizedBox(
+                height: 390,
                 width: double.infinity,
                 child: BuildImage(
                   isNetwork: false,
@@ -116,17 +170,6 @@ class _SearchState extends State<Search> {
                   borderRadius: 0,
                 ),
               ),
-              options: CarouselOptions(
-                height: 360,
-                viewportFraction: 1,
-                autoPlay: true,
-                autoPlayInterval: const Duration(seconds: 5),
-                onPageChanged: (index, _) {
-                  setState(() => _current = index);
-                },
-              ),
-            ),
-
               Positioned.fill(
                 child: Container(
                   decoration: BoxDecoration(
@@ -149,15 +192,25 @@ class _SearchState extends State<Search> {
                   right: 0,
                   child: Text(
                       "Explore \nAll kinds of AI",
-                    style: GoogleFonts.gelasio(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
-                    )
+                      style: GoogleFonts.gelasio(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      )
                   )
               )
-            ]
+            ],
           ),
+          options: CarouselOptions(
+            height: 360,
+            viewportFraction: 1,
+            autoPlay: true,
+            autoPlayInterval: const Duration(seconds: 5),
+            onPageChanged: (index, _) {
+              setState(() => _current = index);
+            },
+          ),
+                      ),
           SizedBox(height: 8),
           // Dots
 

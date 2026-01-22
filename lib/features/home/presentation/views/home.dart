@@ -1,9 +1,13 @@
+import 'dart:developer';
+
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pinterest/core/custom_widgets/custom_pin.dart';
 import '../riverpod/home_provider.dart';
 
@@ -70,31 +74,84 @@ class Home extends ConsumerWidget {
                 child: TabBarView(
                   children: [
                     pinsAsync.when(
-                      loading: () => const Center(child: CircularProgressIndicator()),
+                      loading: () => Center(
+                        child: Container(
+                          height: 80,
+                          width: 80,
+                          decoration: const BoxDecoration(
+                            color: Colors.grey,
+                              shape: BoxShape.circle
+                          ),
+                          child: Lottie.asset(
+                          'assets/lottie/refresh_loading.json',
+                          height: 80,
+                          repeat: true,
+                          animate: true
+                        ),
+                      ),
+                      ),
                       error: (e, _) => Center(child: Text(e.toString())),
-                      data: (pins) => MasonryGridView.count(
-                        key: const PageStorageKey("scroll"),
-                        controller: ref.watch(homeScrollProvider),
-                        physics: const BouncingScrollPhysics(),
-                        padding: EdgeInsets.symmetric(horizontal: 4),
-                        itemCount: pins.length,
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 4,
-                        crossAxisSpacing: 4,
-                        itemBuilder: (context, index) {
-                          final pin = pins[index];
-                          return Container(
-                            constraints: const BoxConstraints(minHeight: 120, maxHeight: 1200),
-                            child: CustomPin(
-                              pin: pin,
-                              isNetwork: true,
-                              onLongPress: (){
-                                print("rehistered long ressed");
-                              },
-                              onTap: () => context.push("/pin_details",extra: pin),
-                            ),
+                      data: (pins) => CustomRefreshIndicator(
+                        offsetToArmed: 80,
+                        onRefresh: () async {
+                          print("arm reached");
+                          await Future.delayed(Duration(seconds: 2));
+                          await ref.refresh(homePinsProvider.future);
+                        },
+                        builder: (context, child, controller) {
+                          log("ctrl state: ${controller.state}");
+                          return Stack(
+                            alignment: Alignment.topCenter,
+                            children: [
+                              Positioned(
+                                top: controller.state == IndicatorState.armed
+                                    || controller.state == IndicatorState.dragging
+                                    || controller.state == IndicatorState.settling
+                                    ? 40 * controller.value
+                                    : 0,
+                                child: Container(
+                                  height: 40 * controller.value,
+                                  constraints: BoxConstraints(
+                                    maxHeight: 40
+                                  ),
+                                  decoration: BoxDecoration(
+                                      color: Colors.grey,
+                                      shape: BoxShape.circle,
+                                  ),
+                                  child: Lottie.asset(
+                                  'assets/lottie/refresh_loading.json',
+                                  fit: BoxFit.cover,
+                                  repeat: controller.isLoading,
+                                  animate: controller.isLoading,
+                                  ),
+                                ),
+                              ),
+                              Transform.translate(
+                                offset: Offset(0.0, 40 * controller.value),
+                                child: child,
+                              )
+                            ],
                           );
                         },
+                        child: MasonryGridView.count(
+                          key: const PageStorageKey("scroll"),
+                          controller: ref.watch(homeScrollProvider),
+                          physics: const BouncingScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          itemCount: pins.length,
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 4,
+                          crossAxisSpacing: 4,
+                          itemBuilder: (context, index) {
+                            final pin = pins[index];
+                            return CustomPin(
+                              pin: pin,
+                              isNetwork: true,
+                              onLongPress: () {},
+                              onTap: () => context.push("/pin_details", extra: pin),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ],
