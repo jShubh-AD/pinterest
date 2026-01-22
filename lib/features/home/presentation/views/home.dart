@@ -5,7 +5,6 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pinterest/core/custom_widgets/custom_pin.dart';
-
 import '../riverpod/home_provider.dart';
 
 class Home extends ConsumerWidget {
@@ -75,6 +74,8 @@ class Home extends ConsumerWidget {
                       loading: () => const Center(child: CircularProgressIndicator()),
                       error: (e, _) => Center(child: Text(e.toString())),
                       data: (pins) => MasonryGridView.count(
+                        key: const PageStorageKey("scroll"),
+                        controller: ref.watch(homeScrollProvider),
                         physics: const BouncingScrollPhysics(),
                         padding: EdgeInsets.symmetric(horizontal: 4),
                         itemCount: pins.length,
@@ -97,8 +98,7 @@ class Home extends ConsumerWidget {
                         },
                       ),
                     ),
-
-                    Center(child: Text("Board")),
+                    Center(key: PageStorageKey("boards"),child: Text("Board")),
                   ],
                 ),
               ),

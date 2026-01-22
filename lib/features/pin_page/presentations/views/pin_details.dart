@@ -10,15 +10,35 @@ import 'package:pinterest/core/custom_widgets/custom_pin.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../home/data/pin_response_model.dart';
+import '../../../home/presentation/riverpod/dashboard_provider.dart';
 import '../../../home/presentation/riverpod/home_provider.dart';
+import '../../../home/presentation/views/dashboard.dart';
 
-class PinDetails extends ConsumerWidget {
+class PinDetails extends ConsumerStatefulWidget {
   final PinModel pin;
-
   const PinDetails({super.key, required this.pin});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PinDetails> createState() => _PinDetailsState();
+}
+
+class _PinDetailsState extends ConsumerState<PinDetails>{
+
+  final controller = ScrollController();
+  final showBottomNav = ValueNotifier(false);
+
+  @override
+  void initState() {
+    super.initState();
+    controller.addListener(() {
+      final screenHeight = MediaQuery.of(context).size.height - 500;
+      showBottomNav.value = controller.offset > screenHeight;
+    });
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
     final pinsAsync = ref.watch(homePinsProvider);
 
     return Scaffold(
@@ -26,6 +46,7 @@ class PinDetails extends ConsumerWidget {
         child: Stack(
           children: [
             SingleChildScrollView(
+              controller: controller,
               padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,10 +56,10 @@ class PinDetails extends ConsumerWidget {
                   Container(
                     constraints: const BoxConstraints(minHeight: 280),
                     child: AspectRatio(
-                      aspectRatio: pin.width / pin.height,
+                      aspectRatio: widget.pin.width / widget.pin.height,
                       child: BuildImage(
                         isNetwork: true,
-                        image: pin.urls.full,
+                        image: widget.pin.urls.full,
                         borderRadius: 20,
                       ),
                     ),
@@ -82,7 +103,7 @@ class PinDetails extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         GestureDetector(
-                          onTap: (){openLink(pin.user.links.html);},
+                          onTap: (){openLink(widget.pin.user.links.html);},
                           child: Row(
                             children: [
                               SizedBox(
@@ -90,18 +111,18 @@ class PinDetails extends ConsumerWidget {
                                 height: 20,
                                 child: BuildImage(
                                     isNetwork: true,
-                                    image: pin.user.profileImage.small,
+                                    image: widget.pin.user.profileImage.small,
                                     borderRadius: 100
                                 ),
                               ),
                               SizedBox(width: 8),
-                              Text(pin.user.name,style: GoogleFonts.roboto(fontSize: 14,fontWeight: FontWeight.w500))
+                              Text(widget.pin.user.name,style: GoogleFonts.roboto(fontSize: 14,fontWeight: FontWeight.w500))
                             ],
                           ),
                         ),
-                        if(pin.description != null && pin.description!.isNotEmpty)
+                        if(widget.pin.description != null && widget.pin.description!.isNotEmpty)
                         Text(
-                          pin.description!,
+                          widget.pin.description!,
                           style: GoogleFonts.roboto(fontSize: 14),
                         ),
                       ],
@@ -121,41 +142,39 @@ class PinDetails extends ConsumerWidget {
                       ),
                     ),
                   ),
+                  SizedBox(height: 4),
 
                   /// SUGGESTIONS GRID (placeholder)
-                  // Expanded(
-                  //   child: pinsAsync.when(
-                  //     loading: () => const Center(child: CircularProgressIndicator()),
-                  //     error: (e, _) => Center(child: Text(e.toString())),
-                  //     data: (pins) => MasonryGridView.count(
-                  //       shrinkWrap: true,
-                  //       physics: const NeverScrollableScrollPhysics(),
-                  //       padding: EdgeInsets.symmetric(horizontal: 4),
-                  //       itemCount: pins.length,
-                  //       crossAxisCount: 2,
-                  //       mainAxisSpacing: 4,
-                  //       crossAxisSpacing: 4,
-                  //       itemBuilder: (context, index) {
-                  //         final pin = pins[index];
-                  //         return Container(
-                  //           constraints: const BoxConstraints(minHeight: 120, maxHeight: 1200),
-                  //           child: CustomPin(
-                  //             pin: pin,
-                  //             isNetwork: true,
-                  //             onLongPress: (){
-                  //               print("rehistered long ressed");
-                  //             },
-                  //             onTap: () => context.push("/pin_details",extra: pin),
-                  //           ),
-                  //         );
-                  //       },
-                  //     ),
-                  //   ),
-                  // ),
+                  pinsAsync.when(
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (e, _) => Center(child: Text(e.toString())),
+                    data: (pins) => MasonryGridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: EdgeInsets.symmetric(horizontal: 4),
+                      itemCount: pins.length,
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 4,
+                      crossAxisSpacing: 4,
+                      itemBuilder: (context, index) {
+                        final pin = pins[index];
+                        return Container(
+                          constraints: const BoxConstraints(minHeight: 120, maxHeight: 1200),
+                          child: CustomPin(
+                            pin: pin,
+                            isNetwork: true,
+                            onLongPress: (){
+                              print("rehistered long ressed");
+                            },
+                            onTap: () => context.push("/pin_details",extra: pin),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),
-
             /// FIXED BACK BUTTON
             Positioned(
               top: 8,
@@ -174,6 +193,20 @@ class PinDetails extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: ValueListenableBuilder(
+        valueListenable: showBottomNav,
+        builder: (_, show, __) {
+          if (!show) return const SizedBox.shrink();
+          return PinterestBottomBar(
+            currentIndex: ref.watch(bottomNavIndexProvider),
+            onTap: (i) {
+              context.go("/");
+              ref.read(bottomNavIndexProvider.notifier).setIndex(i);
+              showBottomNav.value = false;
+            },
+          );
+        },
       ),
     );
   }

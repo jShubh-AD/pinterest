@@ -1,10 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pinterest/features/home/data/home_repo_imp.dart';
 
 import '../../data/pin_response_model.dart';
 
-final homePinsProvider =
-AsyncNotifierProvider<HomePinsNotifier, List<PinModel>>(
+final homePinsProvider = AsyncNotifierProvider<HomePinsNotifier, List<PinModel>>(
   HomePinsNotifier.new,
 );
 
@@ -49,3 +49,16 @@ class HomePinsNotifier extends AsyncNotifier<List<PinModel>> {
     return pins;
   }
 }
+
+
+final homeScrollProvider =  Provider<ScrollController>((ref){
+  final controller = ScrollController();
+  ref.keepAlive();
+  ref.onDispose(() {
+    print("controller disposed");
+    controller.dispose();
+  });
+
+
+  return controller;
+});

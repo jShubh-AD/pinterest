@@ -1,24 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pinterest/features/home/presentation/riverpod/dashboard_provider.dart';
 import 'package:pinterest/features/home/presentation/views/home.dart';
 
-
-import 'package:flutter/material.dart';
-import 'package:pinterest/features/home/presentation/views/home.dart';
-
-class Dashboard extends StatefulWidget {
+class Dashboard extends ConsumerWidget {
   const Dashboard({super.key});
 
   @override
-  State<Dashboard> createState() => _DashboardState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentIndex = ref.watch(bottomNavIndexProvider);
 
-class _DashboardState extends State<Dashboard> {
-  int currentIndex = 0;
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
         index: currentIndex,
@@ -32,7 +26,7 @@ class _DashboardState extends State<Dashboard> {
       ),
       bottomNavigationBar: PinterestBottomBar(
         currentIndex: currentIndex,
-        onTap: (i) => setState(() => currentIndex = i),
+        onTap: (i) => ref.read(bottomNavIndexProvider.notifier).setIndex(i)
       ),
     );
   }
