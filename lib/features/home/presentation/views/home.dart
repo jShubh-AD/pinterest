@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pinterest/core/custom_widgets/custom_pin.dart';
+import '../../../../core/custom_widgets/show_more_sheet.dart';
 import '../riverpod/home_provider.dart';
 
 class Home extends ConsumerWidget {
@@ -16,6 +17,7 @@ class Home extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pinsAsync = ref.watch(homePinsProvider);
+    final showMore = ref.watch(showMoreProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -132,32 +134,36 @@ class Home extends ConsumerWidget {
                             ],
                           );
                         },
-                        child: MasonryGridView.count(
-                          key: const PageStorageKey("scroll"),
-                          controller: ref.watch(homeScrollProvider),
-                          physics: const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          itemCount: pins.length + 1,
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 4,
-                          crossAxisSpacing: 4,
-                          itemBuilder: (context, index) {
-                            if (index == pins.length) {
-                              return const Center(
-                                child: Padding(
-                                  padding: EdgeInsets.all(16.0),
-                                  child: CircularProgressIndicator(),
-                                ),
-                              );
-                            }
-                            final pin = pins[index];
-                            return CustomPin(
-                              pin: pin,
-                              isNetwork: true,
-                              onLongPress: () {},
-                              onTap: () => context.push("/pin_details", extra: pin),
-                            );
-                          },
+                        child: Stack(
+                          children: [
+                            MasonryGridView.count(
+                              key: const PageStorageKey("scroll"),
+                              controller: ref.watch(homeScrollProvider),
+                              physics: const BouncingScrollPhysics(),
+                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              itemCount: pins.length + 1,
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 4,
+                              crossAxisSpacing: 4,
+                              itemBuilder: (context, index) {
+                                if (index == pins.length) {
+                                  return const Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(16.0),
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  );
+                                }
+                                final pin = pins[index];
+                                return CustomPin(
+                                  pin: pin,
+                                  isNetwork: true,
+                                  onLongPress: () {},
+                                  onTap: () => context.push("/pin_details", extra: pin),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     ),

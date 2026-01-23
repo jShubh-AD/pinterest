@@ -1,6 +1,5 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:pinterest/core/custom_widgets/show_more_sheet.dart';
 import 'package:pinterest/features/home/data/pin_response_model.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -36,11 +35,24 @@ class CustomPin extends StatelessWidget {
               borderRadius: 20,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 8,bottom: 4),
-            child: const Align(
-              alignment: Alignment.centerRight,
-              child: Icon(Icons.more_horiz, size: 20),
+          GestureDetector(
+            onTap:(){
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                barrierColor: Colors.white.withOpacity(0.8),
+                builder: (_) {
+                  return ShowMoreSheet(pin: pin);
+                },
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(right: 8,bottom: 4),
+              child: const Align(
+                alignment: Alignment.centerRight,
+                child: Icon(Icons.more_horiz, size: 20),
+              ),
             ),
           ),
         ],

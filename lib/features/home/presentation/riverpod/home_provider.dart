@@ -18,6 +18,8 @@ class HomePinsNotifier extends AsyncNotifier<List<PinModel>> {
     return _fetchPage(reset: true);
   }
 
+
+
   Future<void> fetchNextPage() async {
     if (_isFetching) return;
 
@@ -90,3 +92,15 @@ final pinDetailsScroll =  Provider<ScrollController>((ref){
 
   return controller;
 });
+
+class ShowMore extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void show(bool pin) {
+    state = pin;
+  }
+}
+
+final showMoreProvider =
+NotifierProvider<ShowMore, bool>(ShowMore.new);
