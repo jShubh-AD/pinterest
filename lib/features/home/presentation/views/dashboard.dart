@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pinterest/features/home/presentation/riverpod/dashboard_provider.dart';
 import 'package:pinterest/features/home/presentation/views/home.dart';
 import 'package:pinterest/features/home/presentation/views/widgets/action_buttons.dart';
+import 'package:pinterest/features/inbox/presentation/views/inbox.dart';
 import 'package:pinterest/features/search/presentation/views/search.dart';
 
 import '../../../../core/custom_widgets/snackbars.dart';
@@ -45,7 +46,7 @@ class Dashboard extends ConsumerWidget {
               const Home(),
               const Search(),
               const Placeholder(),
-              const Placeholder(),
+              const InboxPage(),
               const Placeholder(),
             ],
           ),

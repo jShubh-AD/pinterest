@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -138,11 +137,19 @@ class Home extends ConsumerWidget {
                           controller: ref.watch(homeScrollProvider),
                           physics: const BouncingScrollPhysics(),
                           padding: const EdgeInsets.symmetric(horizontal: 4),
-                          itemCount: pins.length,
+                          itemCount: pins.length + 1,
                           crossAxisCount: 2,
                           mainAxisSpacing: 4,
                           crossAxisSpacing: 4,
                           itemBuilder: (context, index) {
+                            if (index == pins.length) {
+                              return const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(16.0),
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            }
                             final pin = pins[index];
                             return CustomPin(
                               pin: pin,

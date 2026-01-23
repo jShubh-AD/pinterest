@@ -53,6 +53,15 @@ class HomePinsNotifier extends AsyncNotifier<List<PinModel>> {
 
 final homeScrollProvider =  Provider<ScrollController>((ref){
   final controller = ScrollController();
+
+  // Add scroll listener for pagination
+  controller.addListener(() {
+    if (controller.position.pixels >= controller.position.maxScrollExtent - 500) {
+      // Trigger pagination when user is 500px from bottom
+      ref.read(homePinsProvider.notifier).fetchNextPage();
+    }
+  });
+
   ref.keepAlive();
   ref.onDispose(() {
     print("controller disposed");

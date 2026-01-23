@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:pinterest/features/home/data/pin_response_model.dart';
 import 'package:shimmer/shimmer.dart';
@@ -11,7 +13,7 @@ class CustomPin extends StatelessWidget {
 
   const CustomPin({
     super.key,
-   required this.pin,
+    required this.pin,
     required this.isNetwork,
     this.onTap,
     this.onLongPress,
@@ -19,24 +21,29 @@ class CustomPin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final aspectRatio = pin.width / pin.height;
     return GestureDetector(
-      onTap: onTap, // will use for navigation
-      onLongPress: onLongPress, // will use for actions(whatsapp, share, search, pin)
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 120, maxHeight: 1200),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            BuildImage(isNetwork: isNetwork, image: pin.urls.regular, borderRadius: 20),
-            Padding(
-              padding: const EdgeInsets.only(right: 8,bottom: 4),
-              child: const Align(
-                alignment: Alignment.centerRight,
-                child: Icon(Icons.more_horiz, size: 20),
-              ),
+      onTap: onTap,
+      onLongPress: onLongPress,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AspectRatio(
+            aspectRatio: aspectRatio,
+            child: BuildImage(
+              isNetwork: isNetwork,
+              image: pin.urls.regular,
+              borderRadius: 20,
             ),
-          ],
-        ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8,bottom: 4),
+            child: const Align(
+              alignment: Alignment.centerRight,
+              child: Icon(Icons.more_horiz, size: 20),
+            ),
+          ),
+        ],
       ),
     );
   }

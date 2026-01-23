@@ -158,16 +158,13 @@ class _PinDetailsState extends ConsumerState<PinDetails>{
                       crossAxisSpacing: 4,
                       itemBuilder: (context, index) {
                         final pin = pins[index];
-                        return Container(
-                          constraints: const BoxConstraints(minHeight: 120, maxHeight: 1200),
-                          child: CustomPin(
-                            pin: pin,
-                            isNetwork: true,
-                            onLongPress: (){
-                              print("rehistered long ressed");
-                            },
-                            onTap: () => context.push("/pin_details",extra: pin),
-                          ),
+                        return CustomPin(
+                          pin: pin,
+                          isNetwork: true,
+                          onLongPress: (){
+                            print("rehistered long ressed");
+                          },
+                          onTap: () => context.push("/pin_details",extra: pin),
                         );
                       },
                     ),
