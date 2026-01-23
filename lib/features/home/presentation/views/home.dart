@@ -4,11 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pinterest/core/custom_widgets/custom_pin.dart';
-import '../../../../core/custom_widgets/show_more_sheet.dart';
 import '../riverpod/home_provider.dart';
 
 class Home extends ConsumerWidget {
@@ -17,7 +15,6 @@ class Home extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pinsAsync = ref.watch(homePinsProvider);
-    final showMore = ref.watch(showMoreProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -159,7 +156,6 @@ class Home extends ConsumerWidget {
                                   pin: pin,
                                   isNetwork: true,
                                   onLongPress: () {},
-                                  onTap: () => context.push("/pin_details", extra: pin),
                                 );
                               },
                             ),

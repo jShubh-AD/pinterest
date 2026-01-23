@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pinterest/features/home/data/home_repo_imp.dart';
-
 import '../../data/pin_response_model.dart';
 
 final homePinsProvider = AsyncNotifierProvider<HomePinsNotifier, List<PinModel>>(
@@ -18,8 +17,6 @@ class HomePinsNotifier extends AsyncNotifier<List<PinModel>> {
     return _fetchPage(reset: true);
   }
 
-
-
   Future<void> fetchNextPage() async {
     if (_isFetching) return;
 
@@ -32,7 +29,7 @@ class HomePinsNotifier extends AsyncNotifier<List<PinModel>> {
         'per_page': _perPage,
       });
 
-      state = AsyncData([...state.value!, ...nextPins]);
+      state = AsyncData([...state.value!, ...?nextPins]);
     } catch (e) {
       state = AsyncError(e, StackTrace.current);
     } finally {
@@ -48,7 +45,7 @@ class HomePinsNotifier extends AsyncNotifier<List<PinModel>> {
       'per_page': _perPage,
     });
 
-    return pins;
+    return pins!;
   }
 }
 
@@ -73,34 +70,3 @@ final homeScrollProvider =  Provider<ScrollController>((ref){
 
   return controller;
 });
-
-final pinDetailsScroll =  Provider<ScrollController>((ref){
-  final controller = ScrollController();
-
-  // Add scroll listener for pagination
-  controller.addListener(() {
-    if (controller.position.pixels >= controller.position.maxScrollExtent - 500) {
-      ref.read(homePinsProvider.notifier).fetchNextPage();
-    }
-  });
-
-  ref.onDispose(() {
-    print("controller disposed");
-    controller.dispose();
-  });
-
-
-  return controller;
-});
-
-class ShowMore extends Notifier<bool> {
-  @override
-  bool build() => false;
-
-  void show(bool pin) {
-    state = pin;
-  }
-}
-
-final showMoreProvider =
-NotifierProvider<ShowMore, bool>(ShowMore.new);

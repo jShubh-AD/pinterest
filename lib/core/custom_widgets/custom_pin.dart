@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pinterest/core/custom_widgets/show_more_sheet.dart';
 import 'package:pinterest/features/home/data/pin_response_model.dart';
 import 'package:shimmer/shimmer.dart';
@@ -7,14 +8,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 class CustomPin extends StatelessWidget {
   final PinModel pin;
   final bool isNetwork;
-  final VoidCallback? onTap;
+  // final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
   const CustomPin({
     super.key,
     required this.pin,
     required this.isNetwork,
-    this.onTap,
+    // this.onTap,
     this.onLongPress,
   });
 
@@ -22,7 +23,7 @@ class CustomPin extends StatelessWidget {
   Widget build(BuildContext context) {
     final aspectRatio = pin.width / pin.height;
     return GestureDetector(
-      onTap: onTap,
+      onTap: () => context.push("/pin_details", extra: pin),
       onLongPress: onLongPress,
       child: Column(
         mainAxisSize: MainAxisSize.min,

@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pinterest/core/constants/app_images.dart';
@@ -43,7 +44,6 @@ class _SearchState extends State<Search> {
                 await Future.delayed(Duration(seconds: 2));
               },
               builder: (context, child, controller) {
-                log("ctrl state: ${controller.state}");
                 return Stack(
                   clipBehavior: Clip.hardEdge,
                   alignment: Alignment.topCenter,
@@ -97,9 +97,7 @@ class _SearchState extends State<Search> {
                     width: MediaQuery.of(context).size.width,
                     padding: EdgeInsets.fromLTRB(16,14,16,6),
                     color: Colors.white.withOpacity(_bgOpacity),
-                    child: GestureDetector(
-                      onTap: (){print("going");}
-                        ,child: searchBox())
+                    child: searchBox()
                 )
             ),
           ]
@@ -109,38 +107,41 @@ class _SearchState extends State<Search> {
   }
 
   Widget searchBox(){
-    return Container(
-      height: 44,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey, width: 1),
-      ),
-      child: Row(
-        children: [
-          SizedBox(width: 12),
-          Icon(
-            Icons.search,
-            color: Colors.black,
-            size: 22,
-          ),
-          SizedBox(width: 12),
-          Text("Search for ideas",
-            style: GoogleFonts.roboto(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey,
+    return GestureDetector(
+      onTap: ()=> context.push("/search_page"),
+      child: Container(
+        height: 44,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey, width: 1),
+        ),
+        child: Row(
+          children: [
+            SizedBox(width: 12),
+            Icon(
+              Icons.search,
+              color: Colors.black,
+              size: 22,
             ),
-          ),
-          const Spacer(),
-          Icon(
-            Icons.camera_alt_outlined,
-            color: Colors.black,
-            size: 18,
-          ),
-          SizedBox(width: 12),
-        ],
+            SizedBox(width: 12),
+            Text("Search for ideas",
+              style: GoogleFonts.roboto(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey,
+              ),
+            ),
+            const Spacer(),
+            Icon(
+              Icons.camera_alt_outlined,
+              color: Colors.black,
+              size: 18,
+            ),
+            SizedBox(width: 12),
+          ],
+        ),
       ),
     );
   }

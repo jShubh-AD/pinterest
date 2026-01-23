@@ -46,6 +46,12 @@ class PinterestApp extends StatelessWidget {
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
 
+        textSelectionTheme: TextSelectionThemeData(
+          cursorColor: Colors.red,
+          selectionColor: Colors.red.shade400,
+          selectionHandleColor: Colors.red.shade400,
+        ),
+
         colorScheme: const ColorScheme.light(
           primary: Colors.black,
           onPrimary: Colors.white,

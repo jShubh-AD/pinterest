@@ -6,53 +6,51 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pinterest/core/custom_widgets/custom_pin.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../../home/data/pin_response_model.dart';
 import '../../../home/presentation/riverpod/dashboard_provider.dart';
 import '../../../home/presentation/riverpod/home_provider.dart';
 import '../../../home/presentation/views/dashboard.dart';
+import '../riverpod/pins_details_provider.dart';
 
 class PinDetails extends ConsumerStatefulWidget {
   final PinModel pin;
+
   const PinDetails({super.key, required this.pin});
 
   @override
   ConsumerState<PinDetails> createState() => _PinDetailsState();
 }
 
-class _PinDetailsState extends ConsumerState<PinDetails>{
+class _PinDetailsState extends ConsumerState<PinDetails> {
 
-  final showBottomNav = ValueNotifier(false);
+  late final ValueNotifier<bool> showBottomBar;
 
   @override
   void initState() {
     super.initState();
-
+    showBottomBar = ValueNotifier(false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller = ref.read(pinDetailsScroll);
-
-     Null scrollListener() {
+      final ctrl = ref.read(pinDetailsScroll);
+      ctrl.addListener(() {
         if (!mounted) return;
         final screenHeight = MediaQuery.of(context).size.height - 500;
-        showBottomNav.value = controller.offset > screenHeight;
-      }
-      controller.addListener(scrollListener);
+        showBottomBar.value = ctrl.offset > screenHeight;
+      });
     });
   }
-
 
 
   @override
   Widget build(BuildContext context) {
     final pinsAsync = ref.watch(homePinsProvider);
-    final scrollController = ref.watch(pinDetailsScroll);
+    final scrollCtrl = ref.watch(pinDetailsScroll);
 
     return Scaffold(
       body: SafeArea(
         child: Stack(
           children: [
             SingleChildScrollView(
-              controller: scrollController,
+              controller: scrollCtrl,
               padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,21 +78,27 @@ class _PinDetailsState extends ConsumerState<PinDetails>{
                       children: [
                         const Icon(Icons.favorite_border, size: 24),
                         const SizedBox(width: 20),
-                        const Icon(Icons.comment_outlined,size: 24),
+                        const Icon(Icons.comment_outlined, size: 24),
                         const SizedBox(width: 20),
-                        const Icon(Icons.share_outlined,size: 24),
+                        const Icon(Icons.share_outlined, size: 24),
                         const SizedBox(width: 20),
-                        const Icon(Icons.more_horiz,size: 24),
+                        const Icon(Icons.more_horiz, size: 24),
                         const Spacer(),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFE60023), // Pinterest red
+                            backgroundColor: const Color(0xFFE60023),
+                            // Pinterest red
                             elevation: 0,
                             padding: const EdgeInsets.symmetric(horizontal: 22),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
                           onPressed: () {},
-                          child: Text("Save", style: GoogleFonts.roboto(color: Colors.white),),
+                          child: Text(
+                            "Save",
+                            style: GoogleFonts.roboto(color: Colors.white),
+                          ),
                         ),
                       ],
                     ),
@@ -109,28 +113,37 @@ class _PinDetailsState extends ConsumerState<PinDetails>{
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         GestureDetector(
-                          onTap: (){openLink(widget.pin.user.links.html);},
+                          onTap: () {
+                            openLink(widget.pin.user.links.html);
+                          },
                           child: Row(
                             children: [
                               SizedBox(
                                 width: 20,
                                 height: 20,
                                 child: BuildImage(
-                                    isNetwork: true,
-                                    image: widget.pin.user.profileImage.small,
-                                    borderRadius: 100
+                                  isNetwork: true,
+                                  image: widget.pin.user.profileImage.small,
+                                  borderRadius: 100,
                                 ),
                               ),
                               SizedBox(width: 8),
-                              Text(widget.pin.user.name,style: GoogleFonts.roboto(fontSize: 14,fontWeight: FontWeight.w500))
+                              Text(
+                                widget.pin.user.name,
+                                style: GoogleFonts.roboto(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                             ],
                           ),
                         ),
-                        if(widget.pin.description != null && widget.pin.description!.isNotEmpty)
-                        Text(
-                          widget.pin.description!,
-                          style: GoogleFonts.roboto(fontSize: 14),
-                        ),
+                        if (widget.pin.description != null &&
+                            widget.pin.description!.isNotEmpty)
+                          Text(
+                            widget.pin.description!,
+                            style: GoogleFonts.roboto(fontSize: 14),
+                          ),
                       ],
                     ),
                   ),
@@ -143,11 +156,12 @@ class _PinDetailsState extends ConsumerState<PinDetails>{
                     child: Text(
                       "More to explore",
                       style: GoogleFonts.roboto(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
                       ),
                     ),
                   ),
+
                   SizedBox(height: 4),
 
                   /// SUGGESTIONS GRID (placeholder)
@@ -175,10 +189,7 @@ class _PinDetailsState extends ConsumerState<PinDetails>{
                         return CustomPin(
                           pin: pin,
                           isNetwork: true,
-                          onLongPress: (){
-                            print("rehistered long ressed");
-                          },
-                          onTap: () => context.push("/pin_details",extra: pin),
+                          onLongPress: () {},
                         );
                       },
                     ),
@@ -186,6 +197,7 @@ class _PinDetailsState extends ConsumerState<PinDetails>{
                 ],
               ),
             ),
+
             /// FIXED BACK BUTTON
             Positioned(
               top: 8,
@@ -205,27 +217,27 @@ class _PinDetailsState extends ConsumerState<PinDetails>{
           ],
         ),
       ),
-      bottomNavigationBar: ValueListenableBuilder(
-        valueListenable: showBottomNav,
+      bottomNavigationBar: ValueListenableBuilder<bool>(
+        valueListenable: showBottomBar,
         builder: (_, show, __) {
-          if (!show) return const SizedBox.shrink();
-          return PinterestBottomBar(
+          return show
+              ? PinterestBottomBar(
             height: 50,
             currentIndex: ref.watch(bottomNavIndexProvider),
             onTap: (i) {
               context.go("/");
               ref.read(bottomNavIndexProvider.notifier).setIndex(i);
-              showBottomNav.value = false;
             },
-          );
+          )
+              : const SizedBox.shrink();
         },
       ),
     );
   }
+
   Future<void> openLink(String url) async {
     final uri = Uri.parse(url);
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication,
-    )) {
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       throw 'Could not launch $url';
     }
   }

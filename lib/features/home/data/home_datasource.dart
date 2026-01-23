@@ -3,7 +3,7 @@ import '../../../core/network/api_service.dart';
 
 class HomeDataSource {
 
-  Future<List<PinModel>> fetchPins(Map<String,dynamic> parameters) async{
+  Future<List<PinModel>?> fetchPins(Map<String,dynamic> parameters) async{
     try{
       return await ApiService().getList(
         path: "", // default page

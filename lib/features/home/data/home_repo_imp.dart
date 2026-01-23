@@ -5,7 +5,7 @@ import 'package:pinterest/features/home/domain/home_repo.dart';
 class HomeRepoImp extends HomeRepository{
 
   @override
-  Future<List<PinModel>> fetchPins(Map<String,dynamic> parameters) async{
+  Future<List<PinModel>?> fetchPins(Map<String,dynamic> parameters) async{
     return await HomeDataSource().fetchPins(parameters);
   }
 }
