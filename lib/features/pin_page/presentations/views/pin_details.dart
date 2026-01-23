@@ -24,29 +24,37 @@ class PinDetails extends ConsumerStatefulWidget {
 
 class _PinDetailsState extends ConsumerState<PinDetails>{
 
-  final controller = ScrollController();
   final showBottomNav = ValueNotifier(false);
 
   @override
   void initState() {
     super.initState();
-    controller.addListener(() {
-      final screenHeight = MediaQuery.of(context).size.height - 500;
-      showBottomNav.value = controller.offset > screenHeight;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = ref.read(pinDetailsScroll);
+
+     Null scrollListener() {
+        if (!mounted) return;
+        final screenHeight = MediaQuery.of(context).size.height - 500;
+        showBottomNav.value = controller.offset > screenHeight;
+      }
+      controller.addListener(scrollListener);
     });
   }
+
 
 
   @override
   Widget build(BuildContext context) {
     final pinsAsync = ref.watch(homePinsProvider);
+    final scrollController = ref.watch(pinDetailsScroll);
 
     return Scaffold(
       body: SafeArea(
         child: Stack(
           children: [
             SingleChildScrollView(
-              controller: controller,
+              controller: scrollController,
               padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,7 +67,7 @@ class _PinDetailsState extends ConsumerState<PinDetails>{
                       aspectRatio: widget.pin.width / widget.pin.height,
                       child: BuildImage(
                         isNetwork: true,
-                        image: widget.pin.urls.full,
+                        image: widget.pin.urls.regular,
                         borderRadius: 20,
                       ),
                     ),
@@ -152,11 +160,19 @@ class _PinDetailsState extends ConsumerState<PinDetails>{
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       padding: EdgeInsets.symmetric(horizontal: 4),
-                      itemCount: pins.length,
+                      itemCount: pins.length + 1,
                       crossAxisCount: 2,
                       mainAxisSpacing: 4,
                       crossAxisSpacing: 4,
                       itemBuilder: (context, index) {
+                        if (index == pins.length) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
                         final pin = pins[index];
                         return CustomPin(
                           pin: pin,

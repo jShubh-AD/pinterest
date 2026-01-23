@@ -32,7 +32,7 @@ class CustomPin extends StatelessWidget {
             aspectRatio: aspectRatio,
             child: BuildImage(
               isNetwork: isNetwork,
-              image: pin.urls.regular,
+              image: pin.urls.small,
               borderRadius: 20,
             ),
           ),

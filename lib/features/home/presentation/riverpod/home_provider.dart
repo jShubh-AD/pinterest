@@ -71,3 +71,22 @@ final homeScrollProvider =  Provider<ScrollController>((ref){
 
   return controller;
 });
+
+final pinDetailsScroll =  Provider<ScrollController>((ref){
+  final controller = ScrollController();
+
+  // Add scroll listener for pagination
+  controller.addListener(() {
+    if (controller.position.pixels >= controller.position.maxScrollExtent - 500) {
+      ref.read(homePinsProvider.notifier).fetchNextPage();
+    }
+  });
+
+  ref.onDispose(() {
+    print("controller disposed");
+    controller.dispose();
+  });
+
+
+  return controller;
+});
