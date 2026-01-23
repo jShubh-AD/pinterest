@@ -141,6 +141,9 @@ class PinterestBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final labels = ["Home", "Search", "Create", "Inbox", "Profile"];
 
+    // Add this check - if height is 0, don't render
+    if (height == 0) return const SizedBox.shrink();
+
     return SafeArea(
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
@@ -225,11 +228,17 @@ class _PressIconState extends State<PressIcon> {
             curve: Curves.linear,
             child: Icon(widget.icon, size: 24),
           ),
-          Text(
-            widget.label,
-            style: GoogleFonts.roboto(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
+          // Add spacing control
+          const SizedBox(height: 2), // Small fixed gap
+          Flexible( // Make text flexible
+            child: Text(
+              widget.label,
+              style: GoogleFonts.roboto(
+                fontSize: 10, // Reduced from 12
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.clip, // Prevent overflow
+              maxLines: 1,
             ),
           ),
         ],

@@ -34,6 +34,7 @@ class _SearchState extends State<Search> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
+        bottom: false,
         child: Stack(
           children: [
             CustomRefreshIndicator(
@@ -44,6 +45,7 @@ class _SearchState extends State<Search> {
               builder: (context, child, controller) {
                 log("ctrl state: ${controller.state}");
                 return Stack(
+                  clipBehavior: Clip.hardEdge,
                   alignment: Alignment.topCenter,
                   children: [
                     Positioned(
@@ -78,6 +80,7 @@ class _SearchState extends State<Search> {
               },
               child: SingleChildScrollView(
                 controller: scrollCtrl,
+                padding: const EdgeInsets.only(bottom: 80),
                 physics: const BouncingScrollPhysics(),
                 child: Column(
                   children: [
