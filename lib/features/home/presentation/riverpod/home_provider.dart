@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pinterest/features/home/data/home_repo_imp.dart';
+import 'package:pinterest/features/home/domain/home_use_case.dart';
 import '../../data/pin_response_model.dart';
 
 final homePinsProvider = AsyncNotifierProvider<HomePinsNotifier, List<PinModel>>(
@@ -11,6 +11,8 @@ class HomePinsNotifier extends AsyncNotifier<List<PinModel>> {
   int _page = 1;
   static const int _perPage = 20;
   bool _isFetching = false;
+
+  final _useCase = HomeUseCase();
 
   @override
   Future<List<PinModel>> build() async {
@@ -24,7 +26,7 @@ class HomePinsNotifier extends AsyncNotifier<List<PinModel>> {
     _page++;
 
     try {
-      final nextPins = await HomeRepoImp().fetchPins({
+      final nextPins = await _useCase.getPins({
         'page': _page,
         'per_page': _perPage,
       });
@@ -40,7 +42,7 @@ class HomePinsNotifier extends AsyncNotifier<List<PinModel>> {
   Future<List<PinModel>> _fetchPage({bool reset = false}) async {
     if (reset) _page = 1;
 
-    final pins = await HomeRepoImp().fetchPins({
+    final pins = await _useCase.getPins({
       'page': _page,
       'per_page': _perPage,
     });
@@ -56,7 +58,6 @@ final homeScrollProvider =  Provider<ScrollController>((ref){
   // Add scroll listener for pagination
   controller.addListener(() {
     if (controller.position.pixels >= controller.position.maxScrollExtent - 500) {
-      // Trigger pagination when user is 500px from bottom
       ref.read(homePinsProvider.notifier).fetchNextPage();
     }
   });

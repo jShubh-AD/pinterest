@@ -1,16 +1,16 @@
 import 'package:pinterest/features/home/data/pin_response_model.dart';
 import '../../../core/network/api_service.dart';
 
-class HomeDataSource {
+class SearchDataSource {
 
   Future<List<PinModel>?> fetchPins(Map<String,dynamic> parameters) async{
     try{
       final response =  await ApiService().get(
-        path: "",
+        path: "https://api.unsplash.com/search/photos/",
         query: parameters,
       );
 
-      final List list = response as List;
+      final List list = response['results'] as List;
       final List<PinModel>? pins = list.map((e) => PinModel.fromJson(e)).toList();
       return pins;
 

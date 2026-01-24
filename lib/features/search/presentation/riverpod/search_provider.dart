@@ -2,8 +2,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pinterest/features/home/data/pin_response_model.dart';
-
-import '../../../home/data/home_repo_imp.dart';
+import 'package:pinterest/features/search/domain/search_use_case.dart';
 
 final searchProvider = AsyncNotifierProvider<SearchNotifier, List<PinModel>?>(
   SearchNotifier.new
@@ -17,6 +16,8 @@ class SearchNotifier extends AsyncNotifier<List<PinModel>?> {
   static const int _perPage = 20;
   bool _isFetching = false;
   String _currentQuery = '';
+
+  final _useCase =SearchUseCase();
 
   @override
   FutureOr<List<PinModel>?> build() {
@@ -34,7 +35,7 @@ class SearchNotifier extends AsyncNotifier<List<PinModel>?> {
     state = const AsyncLoading();
 
     try {
-      final pins = await HomeRepoImp().fetchPins({
+      final pins = await _useCase.getPins({
         'page': _page,
         'per_page': _perPage,
         'query': query,
@@ -48,7 +49,7 @@ class SearchNotifier extends AsyncNotifier<List<PinModel>?> {
     }
   }
 
-  /// 📄 Pagination
+  /// Pagination
   Future<void> fetchNext() async {
     if (_isFetching || _currentQuery.isEmpty) return;
 
@@ -56,7 +57,7 @@ class SearchNotifier extends AsyncNotifier<List<PinModel>?> {
     _page++;
 
     try {
-      final more = await HomeRepoImp().fetchPins({
+      final more = await _useCase.getPins({
         'page': _page,
         'per_page': _perPage,
         'query': _currentQuery,

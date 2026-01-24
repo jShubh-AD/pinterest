@@ -7,9 +7,8 @@ class ApiService {
   static final Dio _dio = DioClient().dio;
 
   /// GET list response
-  Future<List<T>> getList<T>({
+  Future<dynamic> get({
     required String path,
-    required T Function(Map<String, dynamic>) fromJson,
     Map<String, dynamic>? query,
   }) async {
     try {
@@ -18,19 +17,19 @@ class ApiService {
         queryParameters: query,
       );
 
-      if (response.data is! List) {
-        throw 'Invalid response format';
+      // Only return if not null
+      if (response.data == null) {
+        throw 'Empty response';
       }
 
-      return (response.data as List)
-          .map((e) => fromJson(e))
-          .toList();
+      return response.data;
     } on DioException catch (e) {
       throw e.error ?? 'Network error';
-    } catch (_) {
+    } catch (e) {
       throw 'Unexpected error';
     }
   }
+
 
   /// GET single item (e.g. photos/:id)
   Future<T> getItem<T>({
