@@ -98,7 +98,6 @@ class Home extends ConsumerWidget {
                           await ref.refresh(homePinsProvider.future);
                         },
                         builder: (context, child, controller) {
-                          log("ctrl state: ${controller.state}");
                           return Stack(
                             alignment: Alignment.topCenter,
                             children: [

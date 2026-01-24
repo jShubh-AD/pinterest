@@ -1,4 +1,8 @@
+import 'dart:math';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,7 +12,7 @@ import 'package:pinterest/features/home/presentation/riverpod/dashboard_provider
 import 'package:shimmer/shimmer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-class CustomPin extends ConsumerWidget {
+class CustomPin extends ConsumerStatefulWidget {
   final PinModel pin;
   final bool isNetwork;
   final bool isSaved;
@@ -21,19 +25,90 @@ class CustomPin extends ConsumerWidget {
     required this.isNetwork,
     this.onLongPress,
   });
-
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final aspectRatio = pin.width / pin.height;
+  ConsumerState<CustomPin> createState() => _CustomPinState();
+}
+  class _CustomPinState extends ConsumerState<CustomPin>with SingleTickerProviderStateMixin {
+
+    late AnimationController _controller;
+    late Animation<double> _scale;
+
+    OverlayEntry? _overlayEntry;
+
+    @override
+    void initState() {
+      super.initState();
+
+      _controller = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 300),
+        reverseDuration: const Duration(milliseconds: 200),
+      );
+
+      _scale = Tween<double>(begin: 1.0, end: 0.99).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: Curves.linear,
+        ),
+      );
+    }
+
+    @override
+    void dispose() {
+      _controller.dispose();
+      super.dispose();
+    }
+
+    @override
+  Widget build(BuildContext context) {
+    final aspectRatio = widget.pin.width / widget.pin.height;
     return GestureDetector(
-      onTap: () => isSaved
+      onTapUp: (details) => widget.isSaved
           ? {
-              context.go("/"),
-              ref.read(bottomNavIndexProvider.notifier).setIndex(4)
-          }
-          :context.push("/pin_details", extra: pin),
-      onLongPress: onLongPress,
-      child: Column(
+        _controller.reverse(),
+        context.go("/"),
+        ref.read(bottomNavIndexProvider.notifier).setIndex(4),
+      }
+      : {
+        _controller.reverse(),
+        context.push("/pin_details", extra: widget.pin)
+      },
+
+      onTapDown: (details){_controller.forward();},
+
+      onLongPressStart: (details) {
+        final tapLocal = details.localPosition;
+        final RenderBox renderBox = context.findRenderObject() as RenderBox;
+        final tapGlobal = renderBox.localToGlobal(tapLocal);
+
+        _showOverlay(tapGlobal);
+        _controller.forward();
+        setState(() {});
+      },
+      onLongPressEnd: (_) {
+        _overlayEntry?.remove();
+        _overlayEntry = null;
+        _controller.reverse();
+        setState(() {});
+      },
+
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scale.value,
+            child: child,
+          );
+        },
+        child: _buildContent(context,aspectRatio),
+      ),
+
+    );
+  }
+
+
+    Widget _buildContent(BuildContext context, double aspectRatio){
+      return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Stack(
@@ -41,12 +116,13 @@ class CustomPin extends ConsumerWidget {
               AspectRatio(
                 aspectRatio: aspectRatio,
                 child: BuildImage(
-                  isNetwork: isNetwork,
-                  image: pin.urls.small,
+                  isNetwork: widget.isNetwork,
+                  image: widget.pin.urls.small,
                   borderRadius: 20,
                 ),
               ),
-              if(isSaved)
+              // black gradient overlay and profile text
+              if(widget.isSaved) ...[
                 Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
@@ -63,34 +139,36 @@ class CustomPin extends ConsumerWidget {
                       ),
                     )
                 ),
-              if(isSaved)
-              Positioned(
-                  bottom: 8,
-                  right: 8,
-                  left: 12,
-                  child: GestureDetector(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
+                Positioned(
+                    bottom: 8,
+                    right: 8,
+                    left: 12,
+                    child: GestureDetector(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
                             "Profile",
-                          style: GoogleFonts.poppins(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.white
+                            style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.white
+                            ),
                           ),
-                        ),
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          color: Colors.white,
-                          size: 18,
-                        )
-                      ],
-                    ),
-                  )
-              )
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            color: Colors.white,
+                            size: 18,
+                          )
+                        ],
+                      ),
+                    )
+                )
+              ],
+
             ],
           ),
+          // more dotes
           GestureDetector(
             onTap:(){
               showModalBottomSheet(
@@ -99,11 +177,13 @@ class CustomPin extends ConsumerWidget {
                 backgroundColor: Colors.transparent,
                 barrierColor: Colors.white.withOpacity(0.8),
                 builder: (_) {
-                  return ShowMoreSheet(pin: pin);
+                  return ShowMoreSheet(pin: widget.pin);
                 },
               );
             },
-            child: isSaved ? SizedBox.shrink() : Padding(
+            child: widget.isSaved
+                ? SizedBox.shrink()
+                : Padding(
               padding: const EdgeInsets.only(right: 8,bottom: 4),
               child: const Align(
                 alignment: Alignment.centerRight,
@@ -112,7 +192,158 @@ class CustomPin extends ConsumerWidget {
             ),
           ),
         ],
+      );
+    }
+
+    void _showOverlay(Offset tapPos) {
+      final size = MediaQuery.of(context).size;
+
+      final nx = tapPos.dx / size.width;
+      final ny = tapPos.dy / size.height;
+
+      const cornerThreshold = 0.18;
+
+      final nearTop = ny < cornerThreshold;
+      final nearBottom = ny > 1 - cornerThreshold;
+      final nearLeft = nx < cornerThreshold;
+      final nearRight = nx > 1 - cornerThreshold;
+
+      final top = ny;
+      final bottom = 1 - ny;
+      final left = nx;
+      final right = 1 - nx;
+
+      final spaces = {
+        'top': top,
+        'bottom': bottom,
+        'left': left,
+        'right': right,
+
+        'topLeft': top * left,
+        'topRight': top * right,
+        'bottomLeft': bottom * left,
+        'bottomRight': bottom * right,
+      };
+
+// Kill opposite diagonal
+      if (nearTop && nearLeft) {
+        spaces['bottomRight'] = 1;
+      }
+      if (nearTop && nearRight) {
+        spaces['bottomLeft'] = 1;
+      }
+      if (nearBottom && nearLeft) {
+        spaces['topRight'] = 1;
+      }
+      if (nearBottom && nearRight) {
+        spaces['topLeft'] = 1;
+      }
+
+      // Find max
+      final bestDir = spaces.entries.reduce((a, b) => a.value > b.value ? a : b).key;
+      final bestDirV = spaces.entries.reduce((a, b) => a.value > b.value ? a : b).value;
+
+      print("bestDir : $bestDir, bestDirV: $bestDirV");
+
+      final buttonPositions = _getArcButtons(tapPos, bestDir);
+      print("buttonPositions : $buttonPositions");
+
+      final RenderBox renderBox = context.findRenderObject() as RenderBox;
+      final position = renderBox.localToGlobal(Offset.zero);
+      final rSize = renderBox.size;
+
+      _overlayEntry = OverlayEntry(
+        builder: (context) => Stack(
+          children: [
+
+            // bg white dimmer
+            Positioned.fill(
+              child: Container(
+                color: Colors.white.withOpacity(0.9),
+              ),
+            ),
+
+            // selected pin
+            Positioned(
+              left: position.dx,
+              top: position.dy,
+              width: rSize.width,
+              height: rSize.height,
+              child: BuildImage(
+                isNetwork: widget.isNetwork,
+                image: widget.pin.urls.small,
+                borderRadius: 20,
+              ),
+            ),
+
+            ...buttonPositions.asMap().entries.map((entry) {
+              final icons = [Icons.whatshot, Icons.search, Icons.share_outlined, Icons.push_pin_outlined];
+              return Positioned(
+                left: entry.value.dx - 25,
+                top: entry.value.dy - 25,
+                child: _ActionIcon(icons[entry.key]),
+              );
+            }),
+
+          ],
+        ),
+      );
+
+      Overlay.of(context).insert(_overlayEntry!);
+    }
+
+
+    List<Offset> _getArcButtons(Offset center, String direction) {
+      final centerAngle = _getStartAngle(direction);
+      final spacing = math.pi / 4.5;
+
+      return List.generate(4, (i) {
+        // Offset from center: -1.5, -0.5, +0.5, +1.5 spacing
+        final angle = centerAngle + (i - 1.5) * spacing;
+        return Offset(
+          center.dx + 100 * math.sin(angle),
+          center.dy + 100 * math.cos(angle),
+        );
+      });
+    }
+
+    double _getStartAngle(String direction) {
+      switch(direction) {
+        case 'bottom': return 0;
+        case 'bottomRight': return math.pi / 4;
+        case 'right': return math.pi / 2;
+        case 'topRight': return 3 * math.pi / 4;
+        case 'top': return math.pi;
+        case 'topLeft': return 5 * math.pi / 4;
+        case 'left': return 3 * math.pi / 2;
+        case 'bottomLeft': return 7 * math.pi / 4;
+        default: return 0;
+      }
+    }
+  }
+
+class _ActionIcon extends StatelessWidget {
+  final IconData icon;
+
+  const _ActionIcon(this.icon);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black54.withOpacity(0.6),
+              blurRadius: 5,
+              offset: const Offset(0, 2)
+          )
+        ],
+        color: Colors.white,
+        shape: BoxShape.circle,
       ),
+      child: Icon(icon, size: 22),
     );
   }
 }
@@ -142,9 +373,7 @@ class BuildImage extends StatelessWidget {
         ),
       );
     }
-
     return Image.asset(image, fit: BoxFit.cover);
-
   }
 }
 
