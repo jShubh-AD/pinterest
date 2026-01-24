@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'core/network/api_service.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'core/service/api_service.dart';
 import 'core/network/dio_client.dart';
 import 'package:dio/dio.dart';
 import 'core/router/app_router.dart';
@@ -18,6 +19,10 @@ final apiServiceProvider = Provider<ApiService>((ref) {
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+
+  await Hive.openBox('saved_pins');
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

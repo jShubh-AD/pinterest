@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,6 +7,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pinterest/core/custom_widgets/custom_pin.dart';
+import 'package:pinterest/core/service/hive_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../home/data/pin_response_model.dart';
 import '../../../home/presentation/riverpod/dashboard_provider.dart';
@@ -24,6 +27,8 @@ class PinDetails extends ConsumerStatefulWidget {
 class _PinDetailsState extends ConsumerState<PinDetails> {
 
   late final ValueNotifier<bool> showBottomBar;
+
+  bool isSaving = false;
 
   @override
   void initState() {
@@ -87,18 +92,32 @@ class _PinDetailsState extends ConsumerState<PinDetails> {
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFE60023),
-                            // Pinterest red
                             elevation: 0,
                             padding: const EdgeInsets.symmetric(horizontal: 22),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          onPressed: () {},
-                          child: Text(
-                            "Save",
-                            style: GoogleFonts.roboto(color: Colors.white),
-                          ),
+                          onPressed: isSaving
+                              ? null
+                              : () async {
+                                  setState(() => isSaving = true);
+                                  await HiveService.savePin(widget.pin);
+                                  setState(() => isSaving = false);
+                              },
+                          child: isSaving
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2
+                                  )
+                                )
+                              :Text(
+                                "Save",
+                                style: GoogleFonts.roboto(color: Colors.white)
+                              ),
                         ),
                       ],
                     ),

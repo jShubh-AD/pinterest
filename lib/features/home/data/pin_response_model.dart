@@ -31,6 +31,18 @@ class PinModel {
       user: PinUser.fromJson(json['user']),
     );
   }
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'slug': slug,
+      'description': description,
+      'alt_description': altDescription,
+      'width': width,
+      'height': height,
+      'urls': urls.toJson(),
+      'user': user.toJson(),
+    };
+  }
 }
 
 class PinUrls {
@@ -57,6 +69,16 @@ class PinUrls {
       thumb: json['thumb'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'raw': raw,
+      'full': full,
+      'regular': regular,
+      'small': small,
+      'thumb': thumb,
+    };
+  }
 }
 
 class PinUser {
@@ -80,6 +102,15 @@ class PinUser {
       profileImage: UserProfileImage.fromJson(json['profile_image']),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'bio': bio,
+      'links': links.toJson(),
+      'profile_image': profileImage.toJson(),
+    };
+  }
 }
 
 class UserLinks {
@@ -91,6 +122,12 @@ class UserLinks {
     return UserLinks(
       html: json['html'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'html': html,
+    };
   }
 }
 
@@ -111,5 +148,13 @@ class UserProfileImage {
       medium: json['medium'],
       large: json['large'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'small': small,
+      'medium': medium,
+      'large': large,
+    };
   }
 }

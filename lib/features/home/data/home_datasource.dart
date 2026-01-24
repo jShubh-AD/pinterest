@@ -1,5 +1,5 @@
 import 'package:pinterest/features/home/data/pin_response_model.dart';
-import '../../../core/network/api_service.dart';
+import '../../../core/service/api_service.dart';
 
 class HomeDataSource {
 
