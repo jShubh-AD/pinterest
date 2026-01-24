@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pinterest/core/custom_widgets/snackbars.dart';
 import '../../features/home/data/pin_response_model.dart';
+import '../../features/profile/presentation/riverpod/saved_pins_provider.dart';
 import '../service/hive_service.dart';
 import 'custom_pin.dart';
 
-class ShowMoreSheet extends StatelessWidget {
+class ShowMoreSheet extends ConsumerWidget {
   final PinModel pin;
 
   const ShowMoreSheet({super.key, required this.pin});
 
   @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+  Widget build(BuildContext context, WidgetRef ref) {
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -58,7 +59,7 @@ class ShowMoreSheet extends StatelessWidget {
                 icon: Icons.push_pin_outlined,
                 label: "Save",
                 onTap: () async{
-                  final success = await HiveService.savePin(pin);
+                  final success = await ref.read(savedPinsProvider.notifier).addPin(pin);
                   final msg = success
                       ? "Pin saved in quick save!"
                       : "Psst! you already saved this Pin in quick saves";

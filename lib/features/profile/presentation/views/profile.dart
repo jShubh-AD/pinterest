@@ -3,17 +3,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pinterest/core/service/hive_service.dart';
+import 'package:pinterest/features/profile/presentation/views/widgets/layout_bottom_sheet.dart';
 import 'package:pinterest/features/profile/presentation/views/widgets/saved_pins.dart';
-import '../../../home/data/pin_response_model.dart';
+import '../../../../core/constants/grid_layout.dart';
 import '../../../home/presentation/riverpod/dashboard_provider.dart';
+import '../riverpod/saved_pins_provider.dart';
 
 class Profile extends ConsumerWidget {
   const Profile({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    List<PinModel> pins = HiveService.getAllPins();
+    final pins = ref.watch(savedPinsProvider);
+    final layout = ref.watch(savedPinsLayout);
+
+    final crossAxisCount = switch (layout) {
+      GridLayout.large => 1,
+      GridLayout.standard => 2,
+      GridLayout.small => 3,
+    };
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -100,7 +109,7 @@ class Profile extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Row(
                 children: [
-                  _chip(Icons.grid_view, null, null),
+                  _chip(Icons.grid_view,null,()=>showLayoutSheet(context,ref)),
                   const SizedBox(width: 8),
                   _chip(Icons.star_border, "Favorites", null),
                   const SizedBox(width: 8),
@@ -153,7 +162,7 @@ class Profile extends ConsumerWidget {
                       child: MasonryGridView.count(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        crossAxisCount: 2,
+                        crossAxisCount: crossAxisCount,
                         mainAxisSpacing: 6,
                         crossAxisSpacing: 6,
                         itemCount: pins.length,
@@ -208,8 +217,8 @@ class Profile extends ConsumerWidget {
       onTap: onTap ,
       child: Container(
         padding: const EdgeInsets.symmetric(
-          horizontal: 6,
-          vertical: 6,
+          horizontal: 8,
+          vertical: 8,
         ),
         decoration: BoxDecoration(
           color: Colors.grey.shade200,
@@ -219,12 +228,12 @@ class Profile extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             if(icon != null)
-            Icon(icon, size: 16),
+            Icon(icon, size: 18),
             if(text != null) ...[
               const SizedBox(width: 6),
               Text(
                 text,
-                style: GoogleFonts.roboto(fontSize: 13),
+                style: GoogleFonts.roboto(fontSize: 14),
               ),
             ]
           ],
@@ -232,4 +241,14 @@ class Profile extends ConsumerWidget {
       ),
     );
   }
+
+  void showLayoutSheet(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => const LayoutSheet(),
+    );
+  }
+
 }

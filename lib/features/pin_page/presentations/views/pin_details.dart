@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pinterest/core/custom_widgets/custom_pin.dart';
 import 'package:pinterest/core/custom_widgets/snackbars.dart';
 import 'package:pinterest/core/service/hive_service.dart';
+import 'package:pinterest/features/profile/presentation/riverpod/saved_pins_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../home/data/pin_response_model.dart';
 import '../../../home/presentation/riverpod/dashboard_provider.dart';
@@ -104,7 +105,7 @@ class _PinDetailsState extends ConsumerState<PinDetails> {
                               ? null
                               : () async {
                                   setState(() => isSaving = true);
-                                  final success = await HiveService.savePin(widget.pin);
+                                  final success = await ref.read(savedPinsProvider.notifier).addPin(widget.pin);
                                   final msg = success
                                       ? "Pin saved in quick save!"
                                       : "Psst! you already saved this Pin in quick saves";
