@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pinterest/features/home/data/pin_response_model.dart';
 import 'package:pinterest/features/search/domain/search_use_case.dart';
 
-final searchProvider = AsyncNotifierProvider<SearchNotifier, List<PinModel>?>(
+final searchProvider = AsyncNotifierProvider.autoDispose<SearchNotifier, List<PinModel>?>(
   SearchNotifier.new
 );
 
@@ -77,7 +77,7 @@ class SearchNotifier extends AsyncNotifier<List<PinModel>?> {
   }
 }
 
-final searchScrollCtrl = Provider<ScrollController>((ref){
+final searchScrollCtrl = Provider.autoDispose<ScrollController>((ref){
   final controller = ScrollController();
 
   controller.addListener(() {

@@ -6,8 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pinterest/features/search/presentation/riverpod/search_provider.dart';
-
 import '../../../../core/custom_widgets/custom_pin.dart';
+import '../../../../core/service/hive_service.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key});
@@ -28,6 +28,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       setState(() {});
     });
   }
+
+  @override
+  void dispose() {
+    searchCtrl.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -200,6 +208,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                         final pin = pins[index];
                                         return CustomPin(
                                           pin: pin,
+                                          isSaved: HiveService.isSaved(pin.id),
                                           isNetwork: true,
                                           onLongPress: () {},
                                         );

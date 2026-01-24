@@ -7,6 +7,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pinterest/core/custom_widgets/custom_pin.dart';
+import 'package:pinterest/core/custom_widgets/snackbars.dart';
 import 'package:pinterest/core/service/hive_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../home/data/pin_response_model.dart';
@@ -27,7 +28,6 @@ class PinDetails extends ConsumerStatefulWidget {
 class _PinDetailsState extends ConsumerState<PinDetails> {
 
   late final ValueNotifier<bool> showBottomBar;
-
   bool isSaving = false;
 
   @override
@@ -42,6 +42,12 @@ class _PinDetailsState extends ConsumerState<PinDetails> {
         showBottomBar.value = ctrl.offset > screenHeight;
       });
     });
+  }
+
+  @override
+  void dispose(){
+    showBottomBar.dispose();
+    super.dispose();
   }
 
 
@@ -102,7 +108,11 @@ class _PinDetailsState extends ConsumerState<PinDetails> {
                               ? null
                               : () async {
                                   setState(() => isSaving = true);
-                                  await HiveService.savePin(widget.pin);
+                                  final success = await HiveService.savePin(widget.pin);
+                                  final msg = success
+                                      ? "Pin saved in quick save!"
+                                      : "Psst! you already saved this Pin in quick saves";
+                                  InfoSnackBar(context: context, text: msg).show();
                                   setState(() => isSaving = false);
                               },
                           child: isSaving
@@ -207,6 +217,7 @@ class _PinDetailsState extends ConsumerState<PinDetails> {
                         final pin = pins[index];
                         return CustomPin(
                           pin: pin,
+                          isSaved: HiveService.isSaved(pin.id),
                           isNetwork: true,
                           onLongPress: () {},
                         );

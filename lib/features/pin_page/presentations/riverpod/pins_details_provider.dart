@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../home/presentation/riverpod/home_provider.dart';
 
-final pinDetailsScroll =  Provider<ScrollController>((ref){
+final pinDetailsScroll =  Provider.autoDispose<ScrollController>((ref){
   final controller = ScrollController();
 
   controller.addListener(() {

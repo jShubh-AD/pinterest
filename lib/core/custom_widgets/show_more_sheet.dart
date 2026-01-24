@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:pinterest/core/custom_widgets/snackbars.dart';
 import '../../features/home/data/pin_response_model.dart';
+import '../service/hive_service.dart';
 import 'custom_pin.dart';
 
 class ShowMoreSheet extends StatelessWidget {
@@ -54,33 +57,42 @@ class ShowMoreSheet extends StatelessWidget {
               _MenuItem(
                 icon: Icons.push_pin_outlined,
                 label: "Save",
-                onTap: () {},
+                onTap: () async{
+                  final success = await HiveService.savePin(pin);
+                  final msg = success
+                      ? "Pin saved in quick save!"
+                      : "Psst! you already saved this Pin in quick saves";
+                  InfoSnackBar(context: context, text: msg).show();
+                  context.pop();
+                },
               ),
               _MenuItem(
                 icon: Icons.share_outlined,
                 label: "Share",
-                onTap: () {},
+                onTap: () {
+                  commonOnTap(context);
+                },
               ),
               _MenuItem(
                 icon: Icons.download_outlined,
                 label: "Download image",
-                onTap: () {},
+                onTap: () {commonOnTap(context);},
               ),
               _MenuItem(
                 icon: Icons.visibility_outlined,
                 label: "See more like this",
-                onTap: () {},
+                onTap: () {commonOnTap(context);},
               ),
               _MenuItem(
                 icon: Icons.visibility_off_outlined,
                 label: "See less like this",
-                onTap: () {},
+                onTap: () {commonOnTap(context);},
               ),
               _MenuItem(
                 icon: Icons.report_outlined,
                 label: "Report Pin",
                 subtitle: "This goes against Pinterest's\ncommunity guidelines",
-                onTap: () {},
+                onTap: () {commonOnTap(context);},
                 isLast: true,
               ),
 
@@ -136,6 +148,12 @@ class ShowMoreSheet extends StatelessWidget {
       ],
     );
   }
+
+  void commonOnTap(BuildContext context){
+    InfoSnackBar(context: context, text: "A premium feature discovered!").show();
+    context.pop();
+  }
+
 }
 
 class _MenuItem extends StatelessWidget {

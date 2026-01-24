@@ -7,13 +7,21 @@ class HiveService {
   static final _box = Hive.box('saved_pins');
 
   // Save pin
-  static Future<void> savePin(PinModel pin) async {
+  static Future<bool> savePin(PinModel pin) async {
+    if(isSaved(pin.id)){
+      return false;
+    }
     await _box.put(pin.id, pin.toJson());
+    return true;
   }
 
   // Remove pin
-  static Future<void> removePin(String id) async {
+  static Future<bool> removePin(String id) async {
+    if(isSaved(id)){
+      return false;
+    }
     await _box.delete(id);
+    return true;
   }
 
   // Check saved

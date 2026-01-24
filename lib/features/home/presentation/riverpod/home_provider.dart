@@ -52,7 +52,7 @@ class HomePinsNotifier extends AsyncNotifier<List<PinModel>> {
 }
 
 
-final homeScrollProvider =  Provider<ScrollController>((ref){
+final homeScrollProvider =  Provider.autoDispose<ScrollController>((ref){
   final controller = ScrollController();
 
   // Add scroll listener for pagination

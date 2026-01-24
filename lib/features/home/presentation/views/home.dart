@@ -7,6 +7,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pinterest/core/custom_widgets/custom_pin.dart';
+import 'package:pinterest/core/service/hive_service.dart';
 import '../riverpod/home_provider.dart';
 
 class Home extends ConsumerWidget {
@@ -154,6 +155,7 @@ class Home extends ConsumerWidget {
                                 final pin = pins[index];
                                 return CustomPin(
                                   pin: pin,
+                                  isSaved: HiveService.isSaved(pin.id),
                                   isNetwork: true,
                                   onLongPress: () {},
                                 );
