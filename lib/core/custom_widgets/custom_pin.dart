@@ -1,6 +1,4 @@
-import 'dart:math';
 import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,10 +26,14 @@ class CustomPin extends ConsumerStatefulWidget {
   @override
   ConsumerState<CustomPin> createState() => _CustomPinState();
 }
-  class _CustomPinState extends ConsumerState<CustomPin>with SingleTickerProviderStateMixin {
+  class _CustomPinState extends ConsumerState<CustomPin>with TickerProviderStateMixin {
 
     late AnimationController _controller;
     late Animation<double> _scale;
+
+    late AnimationController _actionController;
+    late Animation<double> _actionScale;
+
 
     OverlayEntry? _overlayEntry;
 
@@ -42,7 +44,7 @@ class CustomPin extends ConsumerStatefulWidget {
       _controller = AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 300),
-        reverseDuration: const Duration(milliseconds: 200),
+        reverseDuration: const Duration(milliseconds: 300),
       );
 
       _scale = Tween<double>(begin: 1.0, end: 0.99).animate(
@@ -51,10 +53,24 @@ class CustomPin extends ConsumerStatefulWidget {
           curve: Curves.linear,
         ),
       );
+
+      _actionController = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 260),
+        reverseDuration: const Duration(milliseconds: 300),
+      );
+
+      _actionScale = CurvedAnimation(
+        parent: _actionController,
+        curve: Curves.linear,
+      );
+
+
     }
 
     @override
     void dispose() {
+      _actionController.dispose();
       _controller.dispose();
       super.dispose();
     }
@@ -81,14 +97,16 @@ class CustomPin extends ConsumerStatefulWidget {
         final RenderBox renderBox = context.findRenderObject() as RenderBox;
         final tapGlobal = renderBox.localToGlobal(tapLocal);
 
-        _showOverlay(tapGlobal);
+        _actionController.forward(from: 0);
+        _showOverlay(tapGlobal, widget.isSaved, aspectRatio);
         _controller.forward();
         setState(() {});
       },
       onLongPressEnd: (_) {
         _overlayEntry?.remove();
         _overlayEntry = null;
-        _controller.reverse();
+        _actionController.reverse(from: 1);
+        _controller.reverse(from: 1);
         setState(() {});
       },
 
@@ -195,7 +213,7 @@ class CustomPin extends ConsumerStatefulWidget {
       );
     }
 
-    void _showOverlay(Offset tapPos) {
+    void _showOverlay(Offset tapPos, bool isSaved, double aspectRatio) {
       final size = MediaQuery.of(context).size;
 
       final nx = tapPos.dx / size.width;
@@ -267,23 +285,82 @@ class CustomPin extends ConsumerStatefulWidget {
             Positioned(
               left: position.dx,
               top: position.dy,
-              width: rSize.width,
+              width: rSize.width ,
               height: rSize.height,
-              child: BuildImage(
-                isNetwork: widget.isNetwork,
-                image: widget.pin.urls.small,
-                borderRadius: 20,
+              child: AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: 0.99,
+                    child: child,
+                  );
+                },
+                child: Column(
+                  children: [
+                    AspectRatio(
+                      aspectRatio: aspectRatio,
+                      child: BuildImage(
+                        isNetwork: widget.isNetwork,
+                        image: widget.pin.urls.small,
+                        borderRadius: 20,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap:(){
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          barrierColor: Colors.white.withOpacity(0.8),
+                          builder: (_) {
+                            return ShowMoreSheet(pin: widget.pin);
+                          },
+                        );
+                      },
+                      child: widget.isSaved
+                          ? SizedBox.shrink()
+                          : Padding(
+                        padding: const EdgeInsets.only(right: 8,bottom: 4),
+                        child: const Align(
+                          alignment: Alignment.centerRight,
+                          child: Icon(Icons.more_horiz, size: 20),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
 
             ...buttonPositions.asMap().entries.map((entry) {
-              final icons = [Icons.whatshot, Icons.search, Icons.share_outlined, Icons.push_pin_outlined];
-              return Positioned(
-                left: entry.value.dx - 25,
-                top: entry.value.dy - 25,
-                child: _ActionIcon(icons[entry.key]),
+              final endPos = entry.value;
+
+              return AnimatedBuilder(
+                animation: _actionController,
+                builder: (context, child) {
+                  final t = _actionScale.value;
+
+                  final dx = tapPos.dx + (endPos.dx - tapPos.dx) * t;
+                  final dy = tapPos.dy + (endPos.dy - tapPos.dy) * t;
+
+                  return Positioned(
+                    left: dx - 28,
+                    top: dy - 28,
+                    child: Opacity(
+                    opacity: t,
+                    child: Transform.scale(
+                      scale: t,
+                      child: child,
+                    ),
+                  ),
+                  );
+                },
+                child: _ActionIcon(
+                  [Icons.whatshot, Icons.search, Icons.share_outlined, Icons.push_pin_outlined][entry.key],
+                ),
               );
             }),
+
 
           ],
         ),
