@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pinterest/core/custom_widgets/show_more_sheet.dart';
 import 'package:pinterest/features/home/data/pin_response_model.dart';
+import 'package:pinterest/features/home/presentation/riverpod/dashboard_provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-class CustomPin extends StatelessWidget {
+class CustomPin extends ConsumerWidget {
   final PinModel pin;
   final bool isNetwork;
   final bool isSaved;
@@ -21,10 +23,15 @@ class CustomPin extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final aspectRatio = pin.width / pin.height;
     return GestureDetector(
-      onTap: () => context.push("/pin_details", extra: pin),
+      onTap: () => isSaved
+          ? {
+              context.go("/"),
+              ref.read(bottomNavIndexProvider.notifier).setIndex(4)
+          }
+          :context.push("/pin_details", extra: pin),
       onLongPress: onLongPress,
       child: Column(
         mainAxisSize: MainAxisSize.min,

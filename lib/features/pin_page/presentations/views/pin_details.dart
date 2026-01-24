@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +16,6 @@ import '../riverpod/pins_details_provider.dart';
 
 class PinDetails extends ConsumerStatefulWidget {
   final PinModel pin;
-
   const PinDetails({super.key, required this.pin});
 
   @override
@@ -26,7 +23,6 @@ class PinDetails extends ConsumerStatefulWidget {
 }
 
 class _PinDetailsState extends ConsumerState<PinDetails> {
-
   late final ValueNotifier<bool> showBottomBar;
   bool isSaving = false;
 
@@ -252,13 +248,13 @@ class _PinDetailsState extends ConsumerState<PinDetails> {
         builder: (_, show, __) {
           return show
               ? PinterestBottomBar(
-            height: 50,
-            currentIndex: ref.watch(bottomNavIndexProvider),
-            onTap: (i) {
-              context.go("/");
-              ref.read(bottomNavIndexProvider.notifier).setIndex(i);
-            },
-          )
+                height: 50,
+                currentIndex: ref.watch(bottomNavIndexProvider),
+                onTap: (i) {
+                  context.go("/");
+                  ref.read(bottomNavIndexProvider.notifier).setIndex(i);
+                },
+              )
               : const SizedBox.shrink();
         },
       ),

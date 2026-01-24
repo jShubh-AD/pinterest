@@ -5,6 +5,7 @@ import 'package:pinterest/features/home/presentation/riverpod/dashboard_provider
 import 'package:pinterest/features/home/presentation/views/home.dart';
 import 'package:pinterest/features/home/presentation/views/widgets/action_buttons.dart';
 import 'package:pinterest/features/inbox/presentation/views/inbox.dart';
+import 'package:pinterest/features/profile/presentation/views/profile.dart';
 import 'package:pinterest/features/search/presentation/views/search.dart';
 import '../../../../core/custom_widgets/snackbars.dart';
 
@@ -46,7 +47,7 @@ class Dashboard extends ConsumerWidget {
               const Search(),
               const Placeholder(),
               const InboxPage(),
-              const Placeholder(),
+              const Profile(),
             ],
           ),
           if(show)

@@ -33,76 +33,74 @@ class _SearchState extends State<Search> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
+    return SafeArea(
         bottom: false,
         child: Stack(
-          children: [
-            CustomRefreshIndicator(
-              offsetToArmed: 80,
-              onRefresh: () async {
-                await Future.delayed(Duration(seconds: 2));
-              },
-              builder: (context, child, controller) {
-                return Stack(
-                  clipBehavior: Clip.hardEdge,
-                  alignment: Alignment.topCenter,
-                  children: [
-                    Positioned(
-                      top: controller.state == IndicatorState.armed
-                          || controller.state == IndicatorState.dragging
-                          || controller.state == IndicatorState.settling
-                          ? 40 * controller.value
-                          : 0,
-                      child: Container(
-                        height: 40 * controller.value,
-                        constraints: BoxConstraints(
-                            maxHeight: 40
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.grey,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Lottie.asset(
-                          'assets/lottie/refresh_loading.json',
-                          fit: BoxFit.cover,
-                          repeat: controller.isLoading,
-                          animate: controller.isLoading,
+            children: [
+              CustomRefreshIndicator(
+                offsetToArmed: 80,
+                onRefresh: () async {
+                  await Future.delayed(Duration(seconds: 2));
+                },
+                builder: (context, child, controller) {
+                  return Stack(
+                    clipBehavior: Clip.hardEdge,
+                    alignment: Alignment.topCenter,
+                    children: [
+                      Positioned(
+                        top: controller.state == IndicatorState.armed
+                            || controller.state == IndicatorState.dragging
+                            || controller.state == IndicatorState.settling
+                            ? 40 * controller.value
+                            : 0,
+                        child: Container(
+                          height: 40 * controller.value,
+                          constraints: BoxConstraints(
+                              maxHeight: 40
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Lottie.asset(
+                            'assets/lottie/refresh_loading.json',
+                            fit: BoxFit.cover,
+                            repeat: controller.isLoading,
+                            animate: controller.isLoading,
+                          ),
                         ),
                       ),
-                    ),
-                    Transform.translate(
-                      offset: Offset(0.0, 40 * controller.value),
-                      child: child,
-                    )
-                  ],
-                );
-              },
-              child: SingleChildScrollView(
-                controller: scrollCtrl,
-                padding: const EdgeInsets.only(bottom: 80),
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  children: [
-                    bannerCarousel(),
-                    ideasYouMightLike(false),
-                    ideasYouMightLike(true),
-                  ],
+                      Transform.translate(
+                        offset: Offset(0.0, 40 * controller.value),
+                        child: child,
+                      )
+                    ],
+                  );
+                },
+                child: SingleChildScrollView(
+                  controller: scrollCtrl,
+                  padding: const EdgeInsets.only(bottom: 80),
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    children: [
+                      bannerCarousel(),
+                      ideasYouMightLike(false),
+                      ideasYouMightLike(true),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Positioned(
-                top: 0,
-                child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    padding: EdgeInsets.fromLTRB(16,14,16,6),
-                    color: Colors.white.withOpacity(_bgOpacity),
-                    child: searchBox()
-                )
-            ),
-          ]
+              Positioned(
+                  top: 0,
+                  child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.fromLTRB(16,14,16,6),
+                      color: Colors.white.withOpacity(_bgOpacity),
+                      child: searchBox()
+                  )
+              ),
+            ]
         )
-      ),
     );
   }
 

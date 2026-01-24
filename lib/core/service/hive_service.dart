@@ -46,16 +46,30 @@ class HiveService {
   // Get all saved
   static List<PinModel> getAllPins() {
     return _box.values.map((e) {
-      return PinModel.fromJson(
-        Map<String, dynamic>.from(e),
-      );
+      final map = _deepCast(e);
+      return PinModel.fromJson(map);
     }).toList();
   }
+
 
   // Delete all saved pins
   static Future<void> clearAll() async {
     await _box.clear();
     log("cleared all");
   }
+
+  static dynamic _deepCast(dynamic data) {
+    if (data is Map) {
+      return data.map(
+            (key, value) => MapEntry(
+          key.toString(),
+          _deepCast(value),
+        ),
+      );
+    }
+    return data;
+  }
+
+
 
 }
