@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pinterest/core/custom_widgets/snackbars.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../features/home/data/pin_response_model.dart';
 import '../../features/profile/presentation/riverpod/saved_pins_provider.dart';
-import '../service/hive_service.dart';
 import 'custom_pin.dart';
 
 class ShowMoreSheet extends ConsumerWidget {
@@ -71,7 +71,9 @@ class ShowMoreSheet extends ConsumerWidget {
                 icon: Icons.share_outlined,
                 label: "Share",
                 onTap: () {
-                  commonOnTap(context);
+                  Share.share(
+                      "Check this out: ${pin.urls.full}"
+                  );
                 },
               ),
               _MenuItem(

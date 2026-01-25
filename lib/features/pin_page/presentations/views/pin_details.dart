@@ -8,6 +8,7 @@ import 'package:pinterest/core/custom_widgets/custom_pin.dart';
 import 'package:pinterest/core/custom_widgets/snackbars.dart';
 import 'package:pinterest/core/service/hive_service.dart';
 import 'package:pinterest/features/profile/presentation/riverpod/saved_pins_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../home/data/pin_response_model.dart';
 import '../../../home/presentation/riverpod/dashboard_provider.dart';
@@ -88,7 +89,11 @@ class _PinDetailsState extends ConsumerState<PinDetails> {
                         const SizedBox(width: 20),
                         const Icon(Icons.comment_outlined, size: 24),
                         const SizedBox(width: 20),
-                        const Icon(Icons.share_outlined, size: 24),
+                        GestureDetector(onTap: (){
+                          Share.share(
+                          "Check this out: ${widget.pin.urls.full}");
+                          },child: const Icon(Icons.share_outlined, size: 24)
+                        ),
                         const SizedBox(width: 20),
                         const Icon(Icons.more_horiz, size: 24),
                         const Spacer(),
